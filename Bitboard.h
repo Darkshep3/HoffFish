@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-
+#include <string>
 typedef uint64_t U64;
 
 #define set_bit(b, i) ((b) |= (1ULL << i))

@@ -9,6 +9,7 @@ int main ()
 
     Bitboard board; 
     board.initialize();
+    board.displayBoard();
     board.display(wknights);
     //board.displayBoard();
     return 0;
