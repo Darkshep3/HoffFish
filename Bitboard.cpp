@@ -31,6 +31,7 @@ void Bitboard::display (U64 bitboard){
         cout << endl; 
     
     }
+    cout << endl;
 }
 
 void Bitboard::displayBoard(){
@@ -56,10 +57,18 @@ for (int rank = 7; rank >= 0; rank --){
     }
     cout << endl;
 }
-cout << "  a b c d e f g h";
+cout << "  a b c d e f g h" << endl;
 }
 
 void Bitboard::movePiece(U64 &bitboard, int from, int to){
     set_bit(bitboard, to);
     clear_bit(bitboard, from);
+}
+
+U64 Bitboard::getWhitePieces(){
+    return wpawns | wknights | wbishops | wrooks | wqueens | wking;
+}
+
+U64 Bitboard::getBlackPieces(){
+    return bpawns | bknights | bbishops | brooks | bqueens | bking;
 }
