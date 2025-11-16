@@ -13,6 +13,8 @@ public:
     U64 wpawns, wknights, wbishops, wrooks, wqueens, wking;
     U64 bpawns, bknights, bbishops, brooks, bqueens, bking;
 
+    Bitboard();
+    Bitboard(const Bitboard& other);
     void initialize();
     void display(U64 bitboard);
     void displayBoard();
