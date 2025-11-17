@@ -13,7 +13,7 @@ private:
     static void generateKnightMoves(Bitboard& bb, bool isWhiteToMove, vector<Move>& moves);
     static void generateKingMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves);
     static void generateSlidingMoves(Bitboard& bb, bool white, vector<Move>& moves);
-    static bool squareIsAttacked(const Bitboard& bb, int sq, bool isWhite);
+    static bool isAttackedSquare(Bitboard& bb, int square, bool isWhite);
 
 
 };

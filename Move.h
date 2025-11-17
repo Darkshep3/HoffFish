@@ -22,6 +22,7 @@ public:
 
     //the constructor
     Move(int from, int to);
+    Move(int from, int to, MoveType type);
     Move(int from, int to, MoveType type, char promotion);
 
     int getFromSquare() const{

@@ -1,6 +1,5 @@
 #include <iostream>
-#include "movegenerator.cpp"
-#include "Bitboard.h"
+#include "movegenerator.h"
 
 using namespace std;
 
