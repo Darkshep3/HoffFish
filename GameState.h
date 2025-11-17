@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "bitboard.h"
+#include "Bitboard.h"
 using namespace std;
 
 class GameState{
@@ -12,8 +12,8 @@ class GameState{
         //hint: use the FEN notation we learned to see what is needed to represent a position
 
         //Constructor, a bit of object oriented stuff now
-        GameState();
-        explicit GameState(const string& fen); //Load from FEN string 
+        GameState(); //Diana
+        explicit GameState(const string& fen); //Load from FEN string, Diana 
         //something new I read using explicit in C++
         //if u do GameState g = new GameState("FEN") returns an error as it returns a pointer GameState*
         //as a result, u should do GameState*g = new GameState("FEN") 
