@@ -218,8 +218,68 @@ string GameState::exportFEN(){
 
 }
 
-void GameState::makeMove(int from, int to){
+void GameState::makeMove(int from, int to) {
 
+    // move white pawns
+    if (bb.wpawns & (1ULL << from)) {
+        bb.wpawns &= ~(1ULL << from); // remove from source
+        bb.wpawns |= (1ULL << to);    // place at destination
+    }
+    // move white knights
+    else if (bb.wknights & (1ULL << from)) {
+        bb.wknights &= ~(1ULL << from);
+        bb.wknights |= (1ULL << to);
+    }
+    // move white bishops
+    else if (bb.wbishops & (1ULL << from)) {
+        bb.wbishops &= ~(1ULL << from);
+        bb.wbishops |= (1ULL << to);
+    }
+    // move white rooks
+    else if (bb.wrooks & (1ULL << from)) {
+        bb.wrooks &= ~(1ULL << from);
+        bb.wrooks |= (1ULL << to);
+    }
+    // move white queens
+    else if (bb.wqueens & (1ULL << from)) {
+        bb.wqueens &= ~(1ULL << from);
+        bb.wqueens |= (1ULL << to);
+    }
+    // move white king
+    else if (bb.wking & (1ULL << from)) {
+        bb.wking &= ~(1ULL << from);
+        bb.wking |= (1ULL << to);
+    }
+    // move black pawns
+    else if (bb.bpawns & (1ULL << from)) {
+        bb.bpawns &= ~(1ULL << from);
+        bb.bpawns |= (1ULL << to);
+    }
+    // move black knights
+    else if (bb.bknights & (1ULL << from)) {
+        bb.bknights &= ~(1ULL << from);
+        bb.bknights |= (1ULL << to);
+    }
+    // move black bishops
+    else if (bb.bbishops & (1ULL << from)) {
+        bb.bbishops &= ~(1ULL << from);
+        bb.bbishops |= (1ULL << to);
+    }
+    // move black rooks
+    else if (bb.brooks & (1ULL << from)) {
+        bb.brooks &= ~(1ULL << from);
+        bb.brooks |= (1ULL << to);
+    }
+    // move black queens
+    else if (bb.bqueens & (1ULL << from)) {
+        bb.bqueens &= ~(1ULL << from);
+        bb.bqueens |= (1ULL << to);
+    }
+    // move black king
+    else if (bb.bking & (1ULL << from)) {
+        bb.bking &= ~(1ULL << from);
+        bb.bking |= (1ULL << to);
+    }
 }
 
 void GameState::unmakeMove(){

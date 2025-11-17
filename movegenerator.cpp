@@ -4,6 +4,7 @@ bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
 }
 void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
+<<<<<<< HEAD
     int fromSq = get_LSB(king);
     U64 temp = getKingMoves(fromSq, allies);
     while (temp != 0){
@@ -33,3 +34,17 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, boo
         }
     }
 }
+=======
+    //moves.push_back()
+}
+void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
+{
+    U64 pawns = white ? bb.whitePawns : bb.blackPawns;
+    int direction      = white ? 8 : -8;    
+    int startRank      = white ? 1 : 6;     
+    int promoRank      = white ? 6 : 1;    
+    int epCaptureLeft  = white ? 7 : -9;    
+    int epCaptureRight = white ? 9 : -7; 
+}
+
+>>>>>>> 9519dd1a557b09321d763da09ef876859650a23f
