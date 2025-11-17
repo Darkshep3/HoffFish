@@ -118,26 +118,10 @@ void GameState::loadFEN(const string& str){
     whiteToMove = (nextToMove == 'w');
 
     //set castling variables
-    if (castleSection.find('K') != string::npos) {
-        castleWK = true;
-    } else {
-        castleWK = false;
-    }
-    if (castleSection.find('Q') != string::npos) {
-        castleWQ = true;
-    } else {
-        castleWQ = false;
-    }
-    if (castleSection.find('k') != string::npos) {
-        castleBK = true;
-    } else {
-        castleBK = false;
-    }
-    if (castleSection.find('q') != string::npos) {
-        castleBQ = true;
-    } else {
-        castleBQ = false;
-    }
+    castleWK = (castleSection.find('K') != string::npos);
+    castleWQ = (castleSection.find('Q') != string::npos);
+    castleBK = (castleSection.find('k') != string::npos);
+    castleBQ = (castleSection.find('q') != string::npos);
 
     //set en passant square (if it exists)
     if (enPassantSection != "-") {
