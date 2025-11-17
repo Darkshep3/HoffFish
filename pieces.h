@@ -41,7 +41,7 @@ constexpr U64 computeKnightMoves(int square){
     if (rank > 1 && file < 7) moves |= bitboard >> 15;   // right 1 down 2
     if (rank > 1 && file > 0) moves |= bitboard >> 17; //left 1 down 2
     if (rank < 7 && file > 1) moves |= bitboard << 6; // up 1 left 2
-    //arush finish down 1 left 2 
+    if (rank > 0 && file > 1) moves |= bitboard >> 10; //left 2 down 1
     return moves; 
     
 }

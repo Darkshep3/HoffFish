@@ -1,4 +1,4 @@
-#include "bitboard.h"
+#include "Bitboard.h"
 #include <iostream>
 #include <string> 
 using namespace std;

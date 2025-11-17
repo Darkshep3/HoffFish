@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "bitboard.h"
+#include "Bitboard.h"
 using namespace std;
 
 class GameState{
@@ -8,6 +8,10 @@ class GameState{
         Bitboard board;
         bool whiteToMove;
         bool castleWK, castleWQ;
+        bool castleBK, castleBQ;
+        U64 enPassants;
+        int halfMovesSinceCaptureOrPawn;
+        int fullMoves;
         // small task #1 Ethan 
         //... create the other variables we might need
         //hint: use the FEN notation we learned to see what is needed to represent a position
