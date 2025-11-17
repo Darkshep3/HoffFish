@@ -6,22 +6,19 @@ using namespace std;
 class GameState{
     public: 
         Bitboard board;
-        bool whiteToMove;
+        bool white_to_move;
         bool castleWK, castleWQ;
         bool castleBK, castleBQ;
         U64 enPassants;
-        int halfMovesSinceCaptureOrPawn;
-        int fullMoves;
+        int half_moves;
+        int full_moves;
         // small task #1 Ethan 
         //... create the other variables we might need
         //hint: use the FEN notation we learned to see what is needed to represent a position
 
         //Constructor, a bit of object oriented stuff now
-        GameState();
-        //big task #2 Diana 
-        explicit GameState(const string& fen); //Load from FEN string 
-        //big task #3 Diana 
-
+        GameState(); //Diana
+        explicit GameState(const string& fen); //Load from FEN string, Diana 
         //something new I read using explicit in C++
         //if u do GameState g = new GameState("FEN") returns an error as it returns a pointer GameState*
         //as a result, u should do GameState*g = new GameState("FEN") 

@@ -78,6 +78,7 @@ void Bitboard::movePiece(U64 &bitboard, int from, int to){
     clear_bit(bitboard, from);
 }
 
+<<<<<<< HEAD
 U64 Bitboard::getWhitePieces(){
     return wpawns | wknights | wbishops | wrooks | wqueens | wking;
 }
@@ -85,3 +86,47 @@ U64 Bitboard::getWhitePieces(){
 U64 Bitboard::getBlackPieces(){
     return bpawns | bknights | bbishops | brooks | bqueens | bking;
 }
+=======
+void Bitboard::setBit(char piece, int index) {
+        U64 bit = 1ULL << index;
+        switch (piece) {
+            case 'P':
+                wpawns |= bit;
+            break;
+            case 'N': 
+                wknights |= bit;
+                break;
+            case 'B': 
+                wbishops |= bit;
+                break;
+            case 'R': 
+                wrooks |= bit;
+                break;
+            case 'Q': 
+                wqueens |= bit;
+                break;
+            case 'K': 
+                wking |= bit;
+                break;
+            case 'p': 
+                bpawns |= bit;
+                break;
+            case 'n': 
+                bknights |= bit;
+                break;
+            case 'b': 
+                bbishops |= bit;
+                break;
+            case 'r': 
+                brooks |= bit;
+                break;
+            case 'q': 
+                bqueens |= bit;
+                break;
+            case 'k': 
+                bking |= bit;
+                break;
+        }
+        // displayBoard();
+    }
+>>>>>>> cc4588e (gamestate)

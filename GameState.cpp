@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -8,13 +9,70 @@ using namespace std;
 
 //write all the functions needed in GameState using gamestate.h's skeleton! 
 
-GameState::GameState(){
+class GameState{
+    public: 
+        Bitboard board;
+        bool white_to_move;
+        bool castleWK, castleWQ;
+        bool castleBK, castleBQ;
+        int en_passant; 
+        int full_moves, half_moves;
+        //... create the other variables we might need
+        //hint: use the FEN notation we learned to see what is needed to represent a position
 
-}
+        //Constructor, a bit of object oriented stuff now
+        GameState()
+        {
+            white_to_move = true;
+            castleWK = true;
+            castleWQ = true;
+            castleBK = true;
+            castleBQ = true;
+            int en_passant = -1;
+            full_moves = 0;
+            half_moves = 0;
+            board = Bitboard();
+        }; //Diana
+        explicit GameState(const string fen)
+        {
+            string fen_copy = fen;
+            int length = fen.length();
+            string fen_info[6];
+            //the 6 pieces of info are:
+            // string piece_placement;
+            // string active_color;
+            // string castling_rights;
+            // string en_passant;
+            // string half_moves;
+            // string full_moves;
+            int space_index = fen_copy.find(" "); 
+            for(int i = 0; space_index != string::npos; i++)
+            {
+                
+                //while we can find a space
+                fen_info[i]= fen_copy.substr(0, space_index + 1);
+                //cut down the part we stored
+                fen_copy = fen_copy.substr(space_index + 1, length - (space_index + 1));
+                //get a new index for the next space
+                space_index = fen_copy.find(" ");
+            }
+            
+            //translate from fen to game state
 
-GameState::GameState(const string& fen){
+            //pieces on the board
 
-} 
+            //active color
+
+            //castling rights
+
+            //en passant
+
+            //half move
+
+            //full move
+
+
+        };
 
 void GameState::loadFEN(const string& str){
     //TODO: MUST CLEAR BITBOARD BEFORE RUNNING THIS CODE
@@ -30,7 +88,7 @@ void GameState::loadFEN(const string& str){
     string castleSection;
     string enPassantSection;
 
-    strm >> boardSection >> nextToMove >> castleSection >> enPassantSection >> halfMovesSinceCaptureOrPawn >> fullMoves;
+    strm >> boardSection >> nextToMove >> castleSection >> enPassantSection >> half_moves >> full_moves;
 
     //set bitboard from board data
     int square = 56;
@@ -115,7 +173,7 @@ void GameState::loadFEN(const string& str){
     }
 
     //set white to move or not
-    whiteToMove = (nextToMove == 'w');
+    white_to_move = (nextToMove == 'w');
 
     //set castling variables
     castleWK = (castleSection.find('K') != string::npos);
@@ -185,7 +243,7 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write next player to move
-    if (whiteToMove) {
+    if (white_to_move) {
         strm << 'w';
     } else {
         strm << 'b';
@@ -212,7 +270,7 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write half moves and full moves
-    strm << halfMovesSinceCaptureOrPawn << ' ' << fullMoves;
+    strm << half_moves << ' ' << full_moves;
 
     return strm.str();
 
@@ -285,3 +343,5 @@ void GameState::makeMove(int from, int to) {
 void GameState::unmakeMove(){
 
 }
+
+};
