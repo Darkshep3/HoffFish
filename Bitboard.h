@@ -13,9 +13,14 @@ public:
     U64 wpawns, wknights, wbishops, wrooks, wqueens, wking;
     U64 bpawns, bknights, bbishops, brooks, bqueens, bking;
 
+    Bitboard();
+    Bitboard(const Bitboard& other);
     void initialize();
     void display(U64 bitboard);
     void displayBoard();
     void movePiece(U64 &bitboard, int from, int to);
+    void setBit(char piece, int index);
+    U64 getWhitePieces();
+    U64 getBlackPieces();
     void setBit(char piece, int index);
 };

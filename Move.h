@@ -21,6 +21,7 @@ public:
     MoveType moveType;
 
     //the constructor
+    Move(int from, int to);
     Move(int from, int to, MoveType type, char promotion);
 
     int getFromSquare() const{
@@ -38,5 +39,15 @@ public:
     }
     MoveType getMoveType() const {
         return moveType;
+    }
+private:
+    MoveType getPromotionMoveType(char promotion){
+        switch(promotion){
+            case 'q': return MoveType::PROMOTION_QUEEN;
+            case 'r': return MoveType::PROMOTION_ROOK;
+            case 'b': return MoveType::PROMOTION_BISHOP;
+            case 'n': return MoveType::PROMOTION_KNIGHT;
+            default: return MoveType::NORMAL;
+        }
     }
 };

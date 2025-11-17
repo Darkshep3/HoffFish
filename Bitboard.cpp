@@ -3,20 +3,33 @@
 #include <string> 
 using namespace std;
 
-void Bitboard::initialize(){
-    //wpawn initialization bitboard
-    wpawns = 0x000000000000FF00L; // hexadecimal version 
-    wknights = 0x0000000000000042L;
-    wrooks = 0x0000000000000081L;
-    wbishops = 0x0000000000000024L;
-    wqueens = 0x0000000000000008L;
-    wking = 0x0000000000000010L;
-    bpawns = 0x00FF000000000000L;
-    bknights = 0x4200000000000000L;
-    bbishops = 0x2400000000000000L;
-    brooks = 0x8100000000000000L;
-    bqueens = 0x0800000000000000L;
-    bking = 0x1000000000000000L;
+Bitboard::Bitboard(){
+    wpawns = 0x000000000000FF00ULL; // hexadecimal version 
+    wknights = 0x0000000000000042ULL;
+    wrooks = 0x0000000000000081ULL;
+    wbishops = 0x0000000000000024ULL;
+    wqueens = 0x0000000000000008ULL;
+    wking = 0x0000000000000010ULL;
+    bpawns = 0x00FF000000000000ULL;
+    bknights = 0x4200000000000000ULL;
+    bbishops = 0x2400000000000000ULL;
+    brooks = 0x8100000000000000ULL;
+    bqueens = 0x0800000000000000ULL;
+    bking = 0x1000000000000000ULL;
+}
+Bitboard::Bitboard(const Bitboard& other){
+    wpawns = other.wpawns; 
+    wknights = other.wknights;
+    wrooks = other.wrooks;
+    wbishops = other.wbishops;
+    wqueens = other.wqueens;
+    wking = other.wking;
+    bpawns = other.bpawns;
+    bknights = other.bknights;
+    bbishops = other.bbishops;
+    brooks = other.brooks;
+    bqueens = other.bqueens;
+    bking = other.bking;
 }
 
 void Bitboard::display (U64 bitboard){
@@ -31,6 +44,7 @@ void Bitboard::display (U64 bitboard){
         cout << endl; 
     
     }
+    cout << endl;
 }
 
 void Bitboard::displayBoard(){
@@ -56,7 +70,7 @@ for (int rank = 7; rank >= 0; rank --){
     }
     cout << endl;
 }
-cout << "  a b c d e f g h";
+cout << "  a b c d e f g h" << endl;
 }
 
 void Bitboard::movePiece(U64 &bitboard, int from, int to){
@@ -64,6 +78,18 @@ void Bitboard::movePiece(U64 &bitboard, int from, int to){
     clear_bit(bitboard, from);
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+U64 Bitboard::getWhitePieces(){
+    return wpawns | wknights | wbishops | wrooks | wqueens | wking;
+}
+
+U64 Bitboard::getBlackPieces(){
+    return bpawns | bknights | bbishops | brooks | bqueens | bking;
+}
+=======
+>>>>>>> tmp
 void Bitboard::setBit(char piece, int index) {
         U64 bit = 1ULL << index;
         switch (piece) {
@@ -106,3 +132,7 @@ void Bitboard::setBit(char piece, int index) {
         }
         // displayBoard();
     }
+<<<<<<< HEAD
+=======
+>>>>>>> cc4588e (gamestate)
+>>>>>>> tmp

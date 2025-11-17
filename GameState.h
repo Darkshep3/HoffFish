@@ -6,8 +6,13 @@ using namespace std;
 class GameState{
     public: 
         Bitboard board;
-        bool whiteToMove;
+        bool white_to_move;
         bool castleWK, castleWQ;
+        bool castleBK, castleBQ;
+        U64 enPassants;
+        int half_moves;
+        int full_moves;
+        // small task #1 Ethan 
         //... create the other variables we might need
         //hint: use the FEN notation we learned to see what is needed to represent a position
 
@@ -25,14 +30,15 @@ class GameState{
         //g.board.displayBoard() and u dont need to delete memory 
 
 
-        void loadFEN(const string& str);
+        void loadFEN(const string& str); //big task #4 Arush
         //also apparently when i researched loadFEN (string str) creates a copy whenever u call it
         //therefore, passing by reference is more efficient cause no copy
         // but dont worry too much on these small details for now, we will finetune later! 
 
-        string exportFEN();
+        string exportFEN(); // big task #5 Arush 
 
         void makeMove(int from, int to);
-        void unmakeMove();
+        void unmakeMove(); // medium task #6 Ethan 
+        // finish the pawn move generation or try it out ig 
 
 };
