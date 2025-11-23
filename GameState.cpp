@@ -15,7 +15,7 @@ class GameState{
         bool white_to_move;
         bool castleWK, castleWQ;
         bool castleBK, castleBQ;
-        int en_passants; 
+        int en_passant; 
         int full_moves, half_moves;
         //... create the other variables we might need
         //hint: use the FEN notation we learned to see what is needed to represent a position
@@ -35,6 +35,7 @@ class GameState{
         }; //Diana
         explicit GameState(const string fen)
         {
+            //first split into the 6 parts
             string fen_copy = fen;
             int length = fen.length();
             string fen_info[6];
@@ -50,27 +51,120 @@ class GameState{
             {
                 
                 //while we can find a space
-                fen_info[i]= fen_copy.substr(0, space_index + 1);
+                fen_info[i]= fen_copy.substr(0, space_index);
                 //cut down the part we stored
-                fen_copy = fen_copy.substr(space_index + 1, length - (space_index + 1));
+                fen_copy = fen_copy.substr(space_index + 1);
                 //get a new index for the next space
                 space_index = fen_copy.find(" ");
             }
-            
-            //translate from fen to game state
 
-            //pieces on the board
+            fen_info[5] = fen_copy;
 
-            //active color
 
-            //castling rights
+            //now take piece placement and then separate line by line (separeted by / )
+            string piece_placement[8];
+            int slash_index = fen_info[0].find("/"); 
+            for(int i = 0; slash_index != string::npos; i++)
+            {
+                
+                //while we can find a slash
+                piece_placement[i]= fen_info[0].substr(0, slash_index);
+                //cut down the part we stored
+                fen_info[0] = fen_info[0].substr(slash_index + 1);
+                //get a new index for the next slash
+                slash_index = fen_info[0].find("/");
+            }
 
-            //en passant
+            piece_placement[7] = fen_info[0];
 
-            //half move
+            //translate from fen to game state :d
 
-            //full move
+            //pieces on the board (0)
+            //loop thru each position and if it's not empty then set the bit
+            //nested loop
+            for(int rank = 0; rank < 8; rank++)
+            {
+                //increments the index for piece_placenment
+                int file = 0;
+                for(char current_char: piece_placement[rank])
+                {
+                    //for every character in piece_placement in specified rank,
+                    if(isdigit(current_char))
+                    {
+                        //if current char is an int between 0 - 9
+                        file += current_char - '0';
+                        //increase the file by the # of emoty spaces on the board
+                    }else
+                    {
+                        //there is actual piece on that square
+                        int square = (7-rank) * 8 + file;
+                        //7-rank bc fen begins on 8th rank and goes to 1st
+                        set_bit(current_char, square);
+                        //put that piece on the board
+                        file++;
+                    }
+                    
+                }
+            }
 
+
+
+            //active color (1)
+            if(fen_info[1] == "w")
+            {
+                white_to_move = true;
+            }else
+            {
+                white_to_move = false;
+            }
+
+            //castling rights (2)
+            //set all to false
+            //if it contains "-", leave it bc all is false
+            //else, read in the chars and set corresponding bools to true
+
+            castleWK = false;
+            castleWQ = false;
+            castleBK = false;
+            castleBQ = false;
+
+            if(fen_info[2] != "-")
+            {
+                for(int i = 0; i < fen_info[2].length();i++ )
+                {
+                    if(fen_info[2].at(i) == 'K')
+                    {
+                        castleWK = true;
+                    }else if (fen_info[2].at(i) == 'Q')
+                    {
+                        castleWQ = true;
+                    }else if (fen_info[2].at(i) == 'k')
+                    {
+                        castleBK = true;
+                    }else if(fen_info[2].at(i) == 'q')
+                    {
+                        castleBQ = true;
+                    }
+                }
+            }
+
+            //en passant (3)
+            //if no en passant, set int to -1
+            if(fen_info[3] == "-")
+            {
+                en_passant = -1;
+            }else
+            {
+                int file = fen_info[3].at(0) - 'a';
+                int rank = fen_info[3].at(1) - 1;
+                en_passant = rank*8 + file;
+            }
+
+            //half move (4)
+            half_moves = stoi(fen_info[4]);
+
+            //full move (5)
+            full_moves = stoi(fen_info[5]);
 
         };
 
@@ -190,9 +284,9 @@ void GameState::loadFEN(const string& str){
         strm >> file >> rank;
 
         square = (file - 97) + 8 * (rank - 1);
-        en_passants = 1ULL << square;
+        en_passant = 1ULL << square;
     } else {
-        en_passants = 0ULL;
+        en_passant = 0ULL;
     }
     
 }
@@ -259,8 +353,8 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write en passant square (if it exists)
-    if (en_passants) {
-        int square = __builtin_ctzll(en_passants);
+    if (en_passant) {
+        int square = __builtin_ctzll(en_passant);
         int rank = square / 8; // 0-7
         int file = square % 8; // 0-7
         strm << char(file + 97) << (rank + 1);

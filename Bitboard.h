@@ -7,6 +7,10 @@ typedef uint64_t U64;
 #define get_bit(b, i) ((b) & (1ULL << i))
 #define clear_bit(b, i) ((b) &= ~(1ULL << i))
 #define get_LSB(b) (__builtin_ctzll(b))
+inline void clear_LSB(U64 &b) {
+    b &= (b - 1);
+}
+
 
 class Bitboard {
 public:
