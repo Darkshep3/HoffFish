@@ -52,10 +52,6 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, long empty, b
     int epCaptureRight = white ? 9 : -7; 
 }*/
 
-starting file -> 2 pawns
- en passant
- single file
-  =
 
 //Arush 
 //Bishop Move Generatoin 
