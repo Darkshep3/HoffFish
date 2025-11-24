@@ -4,7 +4,7 @@
 enum class MoveType {
     NORMAL,
     CASTLING,
-    EN_PASSSANT,
+    EN_PASSANT,
     PROMOTION_QUEEN,
     PROMOTION_ROOK,
     PROMOTION_BISHOP,
