@@ -63,65 +63,89 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, bool isWhiteT
 
 //Ethan  
 
-void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves) {
+void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
+{
     U64 pawns = isWhiteToMove ? bb.wpawns : bb.bpawns;
-    int direction = isWhiteToMove ? 8 : -8; // white moves up, black moves down
-    int startRank = isWhiteToMove ? 1 : 6;  // 2nd rank for white, 7th for black
-    int promoRank = isWhiteToMove ? 6 : 1;  // 7th for white, 2nd for black
+    int direction = isWhiteToMove ? 8 : -8;
+    int startRank = isWhiteToMove ? 1 : 6;
+    int promoRank = isWhiteToMove ? 6 : 1;
 
-    while (pawns != 0) {
+    char promoQ = isWhiteToMove ? 'Q' : 'q';
+    char promoR = isWhiteToMove ? 'R' : 'r';
+    char promoB = isWhiteToMove ? 'B' : 'b';
+    char promoN = isWhiteToMove ? 'N' : 'n';
+
+    while (pawns != 0)
+    {
         int fromSq = get_LSB(pawns);
         clear_LSB(pawns);
 
         int rank = fromSq / 8;
         int file = fromSq % 8;
 
-        int toSq = fromSq + direction;
-
-        // Single move forward
-        if (toSq >= 0 && toSq < 64 && ((1ULL << toSq) & (bb.getWhitePieces() | bb.getBlackPieces())) == 0) {
+        int oneStep = fromSq + direction;
+        int twoStep = fromSq + 2*direction;
+        // Pushes
+        if (oneStep >= 0 && oneStep < 64 && ((empty >> oneStep) & 1ULL))
+        {
             // Promotion
-            if (rank == promoRank) {
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'Q' : 'q'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'R' : 'r'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'B' : 'b'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'N' : 'n'));
-            } else {
-                moves.push_back(Move(fromSq, toSq, MoveType::NORMAL));
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_KNIGHT,promoN));
+            }
+            else
+            {
+                moves.push_back(Move(fromSq, oneStep));
             }
 
-            // Double move forward
-            if (rank == startRank) {
-                int doubleTo = fromSq + 2 * direction;
-                if (((1ULL << doubleTo) & (bb.getWhitePieces() | bb.getBlackPieces())) == 0) {
-                    moves.push_back(Move(fromSq, doubleTo, MoveType::DOUBLE_PAWN_PUSH));
-                }
+            // Double push
+            if (rank == startRank && ((empty >> twoStep) & 1ULL))
+            {
+                moves.push_back(Move(fromSq, twoStep));
             }
         }
-
         // Captures
-        int captureOffsets[2] = { direction + 1, direction - 1 }; // right and left diagonals
-        for (int i = 0; i < 2; i++) {
-            int capSq = fromSq + captureOffsets[i];
-            if (capSq < 0 || capSq >= 64) continue;
-
-            int capFile = capSq % 8;
-            if (abs(capFile - file) != 1) continue; // avoid wrap-around (such as capturing from h file to a file)
-
-            if ((1ULL << capSq) & enemy) { // normal capture
-                if (rank == promoRank) { // promotion capture
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'Q' : 'q'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'R' : 'r'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'B' : 'b'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'N' : 'n'));
-                } else {
-                    moves.push_back(Move(fromSq, capSq, MoveType::CAPTURE));
-                }
+        int capLeft = fromSq + direction - 1;
+        int capRight = fromSq + direction + 1;
+        // Left capture
+        if (file != 0 && capLeft >= 0 && capLeft < 64 && ((enemy >> capLeft) & 1ULL))
+        {
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_KNIGHT,promoN));
             }
-
-            // En passant
-            if (capSq == enPassant) {
-                moves.push_back(Move(fromSq, capSq, MoveType::EN_PASSANT));
+            else
+            {
+                moves.push_back(Move(fromSq, capLeft, MoveType::CAPTURES));
+            }
+        }
+        // Right capture
+        if (file != 7 && capRight >= 0 && capRight < 64 && ((enemy >> capRight) & 1ULL))
+        {
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_KNIGHT,promoN));
+            }
+            else
+            {
+                moves.push_back(Move(fromSq, capRight, MoveType::CAPTURES));
+            }
+        }
+        // En Passant
+        if (enPassant != -1)
+        {
+            if (capLeft == enPassant || capRight == enPassant)
+            {
+                moves.push_back(Move(fromSq, enPassant, MoveType::EN_PASSANT));
             }
         }
     }
