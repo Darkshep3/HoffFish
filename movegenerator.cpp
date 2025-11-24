@@ -35,8 +35,31 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, boo
 }
 
 //Diana 
+<<<<<<< HEAD
 void MoveGenerator::generateKnightMoves(Bitboard& bb,  U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+=======
+void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, bool isWhiteToMove, vector<Move>& moves)
+{
+    U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
+    
+    //loop thru each knight
+    while(knights != 0)
+    {
+        int from_sq = get_LSB(knights);
+        clear_LSB(knights);
+        //remove current knight from bitboard
+>>>>>>> refs/remotes/origin/main
 
+        U64 temp = getKnightMoves(from_sq, allies);
+
+        while(temp != 0)
+        {
+            int to_sq = get_LSB(temp);
+            clear_LSB(temp);
+
+            moves.push_back(Move(from_sq,to_sq));
+        }
+    }
 }
 
 

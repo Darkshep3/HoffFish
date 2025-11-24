@@ -78,9 +78,7 @@ void Bitboard::movePiece(U64 &bitboard, int from, int to){
     clear_bit(bitboard, from);
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+
 U64 Bitboard::getWhitePieces(){
     return wpawns | wknights | wbishops | wrooks | wqueens | wking;
 }
@@ -88,8 +86,7 @@ U64 Bitboard::getWhitePieces(){
 U64 Bitboard::getBlackPieces(){
     return bpawns | bknights | bbishops | brooks | bqueens | bking;
 }
-=======
->>>>>>> tmp
+
 void Bitboard::setBit(char piece, int index) {
         U64 bit = 1ULL << index;
         switch (piece) {
@@ -132,7 +129,4 @@ void Bitboard::setBit(char piece, int index) {
         }
         // displayBoard();
     }
-<<<<<<< HEAD
-=======
->>>>>>> cc4588e (gamestate)
->>>>>>> tmp
+    
