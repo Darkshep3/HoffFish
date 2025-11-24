@@ -35,7 +35,7 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, boo
 }
 
 //Diana 
-void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
+void MoveGenerator::generateKnightMoves(Bitboard& bb,  U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
 
 }
 
@@ -52,13 +52,47 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, long empty, b
     int epCaptureRight = white ? 9 : -7; 
 }*/
 
-starting file -> 2 pawns
- en passant
- single file
-  =
+// starting file -> 2 pawns
+//  en passant
+//  single file
+//   =
 
 //Arush 
 //Bishop Move Generatoin 
 // Rooks + queens if you have time  
+void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+    U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
+    vector<int> fromSqs;
+    while (bishops != 0) {
+        fromSqs.push_back(get_LSB(bishops));
+        clear_bit(bishops, get_LSB(bishops));
+    }
 
+    for (int i=0; i<fromSqs.size(); i++) {
+        int fromSq = fromSqs[i];
+        int rank = fromSq / 8;
+        int file = fromSq % 8;
+        for (int j=-1; j<=1; j+=2) {
+            for (int k=-1; k<=1; k+=2) {
+                int mult = 1;
+                int toRank = rank + j * mult;
+                int toFile = file + k * mult; 
+                while (toRank >= 0 && toRank <= 7 && toFile >= 0 && toFile <= 7) {
+                    if (((1ULL << (toRank * 8 + toFile)) & enemy) != 0) {
+                        moves.push_back(Move(fromSq, toRank * 8 + toFile, MoveType::CAPTURES));
+                        toRank = 9;
+                    } else if (((1ULL << (toRank * 8 + toFile)) & empty) != 0){
+                        moves.push_back(Move(fromSq, toRank * 8 + toFile, MoveType::NORMAL));
+                        mult++;
+                        toRank = rank + j * mult;
+                        toFile = file + k * mult;                         
+                    } else {
+                        toRank = 9;
+                    }
+                }
+            }
+        }
+    }
+
+}
 

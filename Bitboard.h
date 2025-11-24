@@ -22,5 +22,5 @@ public:
     void setBit(char piece, int index);
     U64 getWhitePieces();
     U64 getBlackPieces();
-    void setBit(char piece, int index);
+    // void setBit(char piece, int index);
 };
