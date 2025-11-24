@@ -369,73 +369,226 @@ string GameState::exportFEN(){
     return strm.str();
 
 }
-
-void GameState::makeMove(int from, int to) {
-
-    // move white pawns
-    if (bb.wpawns & (1ULL << from)) {
-        bb.wpawns &= ~(1ULL << from); // remove from source
-        bb.wpawns |= (1ULL << to);    // place at destination
-    }
-    // move white knights
-    else if (bb.wknights & (1ULL << from)) {
-        bb.wknights &= ~(1ULL << from);
-        bb.wknights |= (1ULL << to);
-    }
-    // move white bishops
-    else if (bb.wbishops & (1ULL << from)) {
-        bb.wbishops &= ~(1ULL << from);
-        bb.wbishops |= (1ULL << to);
-    }
-    // move white rooks
-    else if (bb.wrooks & (1ULL << from)) {
-        bb.wrooks &= ~(1ULL << from);
-        bb.wrooks |= (1ULL << to);
-    }
-    // move white queens
-    else if (bb.wqueens & (1ULL << from)) {
-        bb.wqueens &= ~(1ULL << from);
-        bb.wqueens |= (1ULL << to);
-    }
-    // move white king
-    else if (bb.wking & (1ULL << from)) {
-        bb.wking &= ~(1ULL << from);
-        bb.wking |= (1ULL << to);
-    }
-    // move black pawns
-    else if (bb.bpawns & (1ULL << from)) {
-        bb.bpawns &= ~(1ULL << from);
-        bb.bpawns |= (1ULL << to);
-    }
-    // move black knights
-    else if (bb.bknights & (1ULL << from)) {
-        bb.bknights &= ~(1ULL << from);
-        bb.bknights |= (1ULL << to);
-    }
-    // move black bishops
-    else if (bb.bbishops & (1ULL << from)) {
-        bb.bbishops &= ~(1ULL << from);
-        bb.bbishops |= (1ULL << to);
-    }
-    // move black rooks
-    else if (bb.brooks & (1ULL << from)) {
-        bb.brooks &= ~(1ULL << from);
-        bb.brooks |= (1ULL << to);
-    }
-    // move black queens
-    else if (bb.bqueens & (1ULL << from)) {
-        bb.bqueens &= ~(1ULL << from);
-        bb.bqueens |= (1ULL << to);
-    }
-    // move black king
-    else if (bb.bking & (1ULL << from)) {
-        bb.bking &= ~(1ULL << from);
-        bb.bking |= (1ULL << to);
-    }
-}
-
-void GameState::unmakeMove(){
-
-}
-
+struct Move {
+    int from;
+    int to;
+    char movedPiece;
+    char capturedPiece;
+    char promotionPiece; // new, for pawn promotion
+    bool castleWK, castleWQ, castleBK, castleBQ;
+    int en_passant;
+    int half_moves;
+    bool isEnPassant;
+    bool isCastling;
 };
+void GameState::makeMove(int from, int to, char promotion = 0) 
+{
+    Move m;
+    m.from = from;
+    m.to = to;
+    m.castleWK = castleWK;
+    m.castleWQ = castleWQ;
+    m.castleBK = castleBK;
+    m.castleBQ = castleBQ;
+    m.en_passant = en_passant;
+    m.half_moves = half_moves;
+    m.promotionPiece = promotion;
+    m.isEnPassant = false;
+    m.isCastling = false;
+
+    char movedPiece = 0;
+    char capturedPiece = 0;
+
+    // Detect piece at source
+    auto removePiece = [&](char piece) {
+        switch(piece) {
+            case 'P': bb.wpawns &= ~(1ULL << from); break;
+            case 'N': bb.wknights &= ~(1ULL << from); break;
+            case 'B': bb.wbishops &= ~(1ULL << from); break;
+            case 'R': bb.wrooks &= ~(1ULL << from); break;
+            case 'Q': bb.wqueens &= ~(1ULL << from); break;
+            case 'K': bb.wking &= ~(1ULL << from); break;
+            case 'p': bb.bpawns &= ~(1ULL << from); break;
+            case 'n': bb.bknights &= ~(1ULL << from); break;
+            case 'b': bb.bbishops &= ~(1ULL << from); break;
+            case 'r': bb.brooks &= ~(1ULL << from); break;
+            case 'q': bb.bqueens &= ~(1ULL << from); break;
+            case 'k': bb.bking &= ~(1ULL << from); break;
+        }
+    };
+
+    auto placePiece = [&](char piece, int square) {
+        switch(piece) {
+            case 'P': bb.wpawns |= (1ULL << square); break;
+            case 'N': bb.wknights |= (1ULL << square); break;
+            case 'B': bb.wbishops |= (1ULL << square); break;
+            case 'R': bb.wrooks |= (1ULL << square); break;
+            case 'Q': bb.wqueens |= (1ULL << square); break;
+            case 'K': bb.wking |= (1ULL << square); break;
+            case 'p': bb.bpawns |= (1ULL << square); break;
+            case 'n': bb.bknights |= (1ULL << square); break;
+            case 'b': bb.bbishops |= (1ULL << square); break;
+            case 'r': bb.brooks |= (1ULL << square); break;
+            case 'q': bb.bqueens |= (1ULL << square); break;
+            case 'k': bb.bking |= (1ULL << square); break;
+        }
+    };
+
+    // Find moved piece
+    if (bb.wpawns & (1ULL << from)) movedPiece = 'P';
+    else if (bb.wknights & (1ULL << from)) movedPiece = 'N';
+    else if (bb.wbishops & (1ULL << from)) movedPiece = 'B';
+    else if (bb.wrooks & (1ULL << from)) movedPiece = 'R';
+    else if (bb.wqueens & (1ULL << from)) movedPiece = 'Q';
+    else if (bb.wking & (1ULL << from)) movedPiece = 'K';
+    else if (bb.bpawns & (1ULL << from)) movedPiece = 'p';
+    else if (bb.bknights & (1ULL << from)) movedPiece = 'n';
+    else if (bb.bbishops & (1ULL << from)) movedPiece = 'b';
+    else if (bb.brooks & (1ULL << from)) movedPiece = 'r';
+    else if (bb.bqueens & (1ULL << from)) movedPiece = 'q';
+    else if (bb.bking & (1ULL << from)) movedPiece = 'k';
+
+    // Detect capture
+    for (char piece : {'P','N','B','R','Q','K','p','n','b','r','q','k'}) {
+        int square = to;
+        if (piece == 'P' && (bb.wpawns & (1ULL << square))) capturedPiece = 'P';
+        else if (piece == 'N' && (bb.wknights & (1ULL << square))) capturedPiece = 'N';
+        else if (piece == 'B' && (bb.wbishops & (1ULL << square))) capturedPiece = 'B';
+        else if (piece == 'R' && (bb.wrooks & (1ULL << square))) capturedPiece = 'R';
+        else if (piece == 'Q' && (bb.wqueens & (1ULL << square))) capturedPiece = 'Q';
+        else if (piece == 'K' && (bb.wking & (1ULL << square))) capturedPiece = 'K';
+        else if (piece == 'p' && (bb.bpawns & (1ULL << square))) capturedPiece = 'p';
+        else if (piece == 'n' && (bb.bknights & (1ULL << square))) capturedPiece = 'n';
+        else if (piece == 'b' && (bb.bbishops & (1ULL << square))) capturedPiece = 'b';
+        else if (piece == 'r' && (bb.brooks & (1ULL << square))) capturedPiece = 'r';
+        else if (piece == 'q' && (bb.bqueens & (1ULL << square))) capturedPiece = 'q';
+        else if (piece == 'k' && (bb.bking & (1ULL << square))) capturedPiece = 'k';
+    }
+
+    // Handle en passant
+    if ((movedPiece == 'P' || movedPiece == 'p') && to == en_passant) {
+        m.isEnPassant = true;
+        if (white_to_move) capturedPiece = 'p';
+        else capturedPiece = 'P';
+        int cap_square = white_to_move ? to - 8 : to + 8;
+        removePiece(capturedPiece);
+        to = to; // move normally
+    }
+
+    // Handle castling
+    if (movedPiece == 'K' || movedPiece == 'k') {
+        if (abs(to - from) == 2) { // castling detected
+            m.isCastling = true;
+            if (to == 6) { // white kingside
+                removePiece('R'); bb.wrooks |= (1ULL << 5);
+            } else if (to == 2) { // white queenside
+                removePiece('R'); bb.wrooks |= (1ULL << 3);
+            } else if (to == 62) { // black kingside
+                removePiece('r'); bb.brooks |= (1ULL << 61);
+            } else if (to == 58) { // black queenside
+                removePiece('r'); bb.brooks |= (1ULL << 59);
+            }
+        }
+    }
+
+    // Remove piece from source
+    removePiece(movedPiece);
+
+    // Handle promotion
+    if (promotion) {
+        placePiece(promotion, to);
+        m.promotionPiece = promotion;
+    } else {
+        placePiece(movedPiece, to);
+    }
+
+    m.movedPiece = movedPiece;
+    m.capturedPiece = capturedPiece;
+    moveHistory.push_back(m);
+
+    // Update en passant for next move
+    en_passant = -1;
+    if (movedPiece == 'P' && from/8 == 1 && to/8 == 3) en_passant = from + 8;
+    else if (movedPiece == 'p' && from/8 == 6 && to/8 == 4) en_passant = from - 8;
+
+    white_to_move = !white_to_move;
+}
+
+
+void GameState::unmakeMove() {
+    if (moveHistory.empty()) return;
+
+    Move m = moveHistory.back();
+    moveHistory.pop_back();
+
+    // Remove moved piece from destination
+    auto removePiece = [&](char piece, int square) {
+        switch(piece) {
+            case 'P': bb.wpawns &= ~(1ULL << square); break;
+            case 'N': bb.wknights &= ~(1ULL << square); break;
+            case 'B': bb.wbishops &= ~(1ULL << square); break;
+            case 'R': bb.wrooks &= ~(1ULL << square); break;
+            case 'Q': bb.wqueens &= ~(1ULL << square); break;
+            case 'K': bb.wking &= ~(1ULL << square); break;
+            case 'p': bb.bpawns &= ~(1ULL << square); break;
+            case 'n': bb.bknights &= ~(1ULL << square); break;
+            case 'b': bb.bbishops &= ~(1ULL << square); break;
+            case 'r': bb.brooks &= ~(1ULL << square); break;
+            case 'q': bb.bqueens &= ~(1ULL << square); break;
+            case 'k': bb.bking &= ~(1ULL << square); break;
+        }
+    };
+
+    auto placePiece = [&](char piece, int square) {
+        switch(piece) {
+            case 'P': bb.wpawns |= (1ULL << square); break;
+            case 'N': bb.wknights |= (1ULL << square); break;
+            case 'B': bb.wbishops |= (1ULL << square); break;
+            case 'R': bb.wrooks |= (1ULL << square); break;
+            case 'Q': bb.wqueens |= (1ULL << square); break;
+            case 'K': bb.wking |= (1ULL << square); break;
+            case 'p': bb.bpawns |= (1ULL << square); break;
+            case 'n': bb.bknights |= (1ULL << square); break;
+            case 'b': bb.bbishops |= (1ULL << square); break;
+            case 'r': bb.brooks |= (1ULL << square); break;
+            case 'q': bb.bqueens |= (1ULL << square); break;
+            case 'k': bb.bking |= (1ULL << square); break;
+        }
+    };
+
+    removePiece(m.promotionPiece ? m.promotionPiece : m.movedPiece, m.to);
+    placePiece(m.movedPiece, m.from);
+
+    // Restore captured piece
+    if (m.capturedPiece) {
+        if (m.isEnPassant) {
+            int cap_square = white_to_move ? m.to - 8 : m.to + 8;
+            placePiece(m.capturedPiece, cap_square);
+        } else {
+            placePiece(m.capturedPiece, m.to);
+        }
+    }
+
+    // Undo castling
+    if (m.isCastling) {
+        if (m.to == 6) { // white kingside
+            removePiece('R', 5); placePiece('R', 7);
+        } else if (m.to == 2) { // white queenside
+            removePiece('R', 3); placePiece('R', 0);
+        } else if (m.to == 62) { // black kingside
+            removePiece('r', 61); placePiece('r', 63);
+        } else if (m.to == 58) { // black queenside
+            removePiece('r', 59); placePiece('r', 56);
+        }
+    }
+
+    // Restore castling, en passant, half_moves
+    castleWK = m.castleWK;
+    castleWQ = m.castleWQ;
+    castleBK = m.castleBK;
+    castleBQ = m.castleBQ;
+    en_passant = m.en_passant;
+    half_moves = m.half_moves;
+
+    white_to_move = !white_to_move;
+}
