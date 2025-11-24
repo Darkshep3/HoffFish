@@ -77,6 +77,11 @@ void Bitboard::movePiece(U64 &bitboard, int from, int to){
     set_bit(bitboard, to);
     clear_bit(bitboard, from);
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> refs/remotes/origin/main
 U64 Bitboard::getWhitePieces(){
     return wpawns | wknights | wbishops | wrooks | wqueens | wking;
 }
@@ -85,7 +90,11 @@ U64 Bitboard::getBlackPieces(){
     return bpawns | bknights | bbishops | brooks | bqueens | bking;
 }
 
+<<<<<<< HEAD
 void Bitboard::charToBit(char piece, int index) {
+=======
+void Bitboard::setBit(char piece, int index) {
+>>>>>>> refs/remotes/origin/main
         U64 bit = 1ULL << index;
         switch (piece) {
             case 'P':
@@ -127,4 +136,8 @@ void Bitboard::charToBit(char piece, int index) {
         }
         // displayBoard();
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> refs/remotes/origin/main
