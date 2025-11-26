@@ -2,7 +2,7 @@
 bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
 
 }
-void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
+void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
     U64 temp = getKingMoves(fromSq, allies);
@@ -35,7 +35,7 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, boo
 }
 
 //Diana 
-void MoveGenerator::generateKnightMoves(Bitboard& bb, long allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
    U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
 
@@ -164,6 +164,13 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool
             }
         }
     }
-
+    //Arush 
+    //generate rook moves + queens
+    //queen = rook + bishops 
+    /*MoveGenerator::generateQueensMoves(...){
+        movegenerator:generatebishopMoves()
+        movegenerator:generaterookMoves() 
+    }
+    */ 
 }
 

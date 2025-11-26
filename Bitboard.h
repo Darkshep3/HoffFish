@@ -26,8 +26,4 @@ public:
     void charToBit(char piece, int index);
     U64 getWhitePieces();
     U64 getBlackPieces();
-<<<<<<< HEAD
-=======
-    // void setBit(char piece, int index);
->>>>>>> refs/remotes/origin/main
 };
