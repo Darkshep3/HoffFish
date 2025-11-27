@@ -19,11 +19,13 @@ public:
 
     Bitboard();
     Bitboard(const Bitboard& other);
-    void initialize();
     void display(U64 bitboard);
+    void initialize();
     void displayBoard();
     void movePiece(U64 &bitboard, int from, int to);
     void charToBit(char piece, int index);
     U64 getWhitePieces();
     U64 getBlackPieces();
+    U64 getOccupied();
+    U64 getEmpty();
 };

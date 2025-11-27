@@ -9,7 +9,7 @@ public:
 //Diana 
     static vector<Move> generateLegalMoves(GameState& state); 
     static vector<Move> generatePseudoMoves(const GameState& state);
-private:
+//private:
     static void generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
     static void generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
     static void generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);

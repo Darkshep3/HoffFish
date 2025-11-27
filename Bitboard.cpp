@@ -4,19 +4,20 @@
 using namespace std;
 
 Bitboard::Bitboard(){
-    wpawns = 0x000000000000FF00ULL; // hexadecimal version 
-    wknights = 0x0000000000000042ULL;
-    wrooks = 0x0000000000000081ULL;
-    wbishops = 0x0000000000000024ULL;
-    wqueens = 0x0000000000000008ULL;
-    wking = 0x0000000000000010ULL;
-    bpawns = 0x00FF000000000000ULL;
-    bknights = 0x4200000000000000ULL;
-    bbishops = 0x2400000000000000ULL;
-    brooks = 0x8100000000000000ULL;
-    bqueens = 0x0800000000000000ULL;
-    bking = 0x1000000000000000ULL;
+    wpawns = 0x0000000000000000ULL; // hexadecimal version 
+    wknights = 0x0000000000000000ULL;
+    wrooks = 0x0000000000000000ULL;
+    wbishops = 0x0000000000000000ULL;
+    wqueens = 0x0000000000000000ULL;
+    wking = 0x0000000000000000ULL;
+    bpawns = 0x0000000000000000ULL;
+    bknights = 0x0000000000000000ULL;
+    bbishops = 0x0000000000000000ULL;
+    brooks = 0x0000000000000000ULL;
+    bqueens = 0x0000000000000000ULL;
+    bking = 0x0000000000000000ULL;
 }
+
 Bitboard::Bitboard(const Bitboard& other){
     wpawns = other.wpawns; 
     wknights = other.wknights;
@@ -32,6 +33,20 @@ Bitboard::Bitboard(const Bitboard& other){
     bking = other.bking;
 }
 
+void Bitboard::initialize(){
+    wpawns = 0x000000000000FF00ULL; // hexadecimal version 
+    wknights = 0x0000000000000042ULL;
+    wrooks = 0x0000000000000081ULL;
+    wbishops = 0x0000000000000024ULL;
+    wqueens = 0x0000000000000008ULL;
+    wking = 0x0000000000000010ULL;
+    bpawns = 0x00FF000000000000ULL;
+    bknights = 0x4200000000000000ULL;
+    bbishops = 0x2400000000000000ULL;
+    brooks = 0x8100000000000000ULL;
+    bqueens = 0x0800000000000000ULL;
+    bking = 0x1000000000000000ULL;
+}
 void Bitboard::display (U64 bitboard){
     for (int rank = 7; rank >= 0; rank--){
         for (int file = 0; file < 8; file++){
@@ -126,4 +141,11 @@ void Bitboard::charToBit(char piece, int index) {
                 break;
         }
         // displayBoard();
+    }
+
+    U64 Bitboard::getOccupied(){
+        return getWhitePieces() | getBlackPieces();
+    }
+    U64 Bitboard::getEmpty(){
+        return ~getOccupied();
     }

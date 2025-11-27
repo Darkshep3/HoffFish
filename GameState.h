@@ -1,15 +1,17 @@
 #pragma once
 #include <string>
 #include "Bitboard.h"
+#include "Move.h"
+#include "Delta.h"
 using namespace std;
 
 class GameState{
     public: 
-        Bitboard board;
+        Bitboard bb;
         bool white_to_move;
         bool castleWK, castleWQ;
         bool castleBK, castleBQ;
-        U64 enPassants;
+        int en_passant;
         int half_moves;
         int full_moves;
         // small task #1 Ethan 
@@ -37,8 +39,8 @@ class GameState{
 
         string exportFEN(); // big task #5 Arush 
 
-        void makeMove(int from, int to);
-        void unmakeMove(); // medium task #6 Ethan 
+        void makeMove(Move move);
+        void unmakeMove(const Delta& d); // medium task #6 Ethan 
         // finish the pawn move generation or try it out ig 
 
 };

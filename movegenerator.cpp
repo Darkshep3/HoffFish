@@ -52,11 +52,11 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteTo
 
        while(temp != 0)
        {
-           int to_sq = get_LSB(temp);
-           clear_LSB(temp);
+            int to_sq = get_LSB(temp);
+            clear_LSB(temp);
+        
 
-
-           moves.push_back(Move(from_sq,to_sq));
+            moves.push_back(Move(from_sq,to_sq));
        }
    }
 }
