@@ -18,7 +18,7 @@ public:
     MoveType moveType;
 
     //constructor
-    Delta(int from, int to, char movedPiece, char promotionPiece, bool white_to_move, bool castleWK,
+    Delta(int from, int to, char movedPiece, char capturedPiece, char promotionPiece, bool white_to_move, bool castleWK,
         bool castleWQ, bool castleBK, bool castleBQ, int enPassant, int halfCount, int fullCount, MoveType movetype):
         from(from), 
         to(to), 
