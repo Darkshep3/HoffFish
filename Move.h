@@ -16,8 +16,8 @@ class Move{
 public:
     int from;
     int to;
-    char capturedPiece;
-    char promotionPiece;
+    char captured;
+    char promotion;
     MoveType moveType;
 
     //the constructor
@@ -26,8 +26,8 @@ public:
         this-> from = from;
         this-> to = to;
         moveType = MoveType::NORMAL;
-        capturedPiece = ' ';
-        promotionPiece = ' ';
+        captured = ' ';
+        promotion = ' ';
     }
 
     Move(int from, int to, MoveType type)
@@ -35,8 +35,8 @@ public:
         this-> from = from;
         this-> to = to;
         this -> moveType = type;
-        capturedPiece = ' ';
-        promotionPiece = ' ';
+        captured = ' ';
+        promotion = ' ';
     }
 
     Move(int from, int to, MoveType type, char promotion)
@@ -44,8 +44,8 @@ public:
         this-> from = from;
         this-> to = to;
         this-> moveType = type;
-        capturedPiece = ' ';
-        this-> promotionPiece = promotion;
+        captured = ' ';
+        this-> promotion = promotion;
     }
 
 
@@ -57,10 +57,10 @@ public:
     }
 
     char getCapturedPiece() const {
-        return capturedPiece;
+        return captured;
     }
     char getPromotionPiece() const{
-        return promotionPiece;
+        return promotion;
     }
     MoveType getMoveType() const {
         return moveType;

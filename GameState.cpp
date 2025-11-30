@@ -68,7 +68,7 @@ GameState::GameState(const string& fen)
 
     //translate from fen to game state :d
 
-    //pieces on the board (0)
+    //pieces on the bb (0)
     //loop thru each position and if it's not empty then set the bit
     //nested loop
     for(int rank = 0; rank < 8; rank++)
@@ -82,7 +82,7 @@ GameState::GameState(const string& fen)
             {
                 //if current char is an int between 0 - 9
                 file += current_char - '0';
-                //increase the file by the # of emoty spaces on the board
+                //increase the file by the # of emoty spaces on the bb
             }else
             {
                 //there is actual piece on that square
@@ -90,9 +90,9 @@ GameState::GameState(const string& fen)
                 //7-rank bc fen begins on 8th rank and goes to 1st
 
                 //set_bit(current_char, square);
-                bb.charToBit(current_char, square);
+                bb.placePiece(current_char, square);
 
-                //put that piece on the board
+                //put that piece on the bb
                 file++;
             }
             
@@ -169,17 +169,17 @@ void GameState::loadFEN(const string& str){
     istringstream strm;
     strm.str(str);
 
-    string boardSection;
+    string bbSection;
     char nextToMove;
     string castleSection;
     string enPassantSection;
 
-    strm >> boardSection >> nextToMove >> castleSection >> enPassantSection >> half_moves >> full_moves;
+    strm >> bbSection >> nextToMove >> castleSection >> enPassantSection >> half_moves >> full_moves;
 
-    //set bitboard from board data
+    //set bitbb from bb data
     int square = 56;
-    for (int i=0; i<boardSection.length(); i++) {
-        switch (boardSection[i]) {
+    for (int i=0; i<bbSection.length(); i++) {
+        switch (bbSection[i]) {
             case 'r':
                 bb.brooks |= (1ULL << square);
                 square++;
@@ -287,7 +287,7 @@ string GameState::exportFEN(){
 
     ostringstream strm;
 
-    //write bitboard data to FEN format
+    //write bitbb data to FEN format
     int emptySpaces = 0;
     for (int rank=7; rank>=0; rank--){
         for (int file=0; file<8; file++){
@@ -363,8 +363,8 @@ string GameState::exportFEN(){
 }
 
 void GameState::makeMove(const Move& m, Delta& d) {
-    char piece = board[m.from];
-    char target = board[m.to];
+    char piece = bb[m.from];
+    char target = bb[m.to];
 
     // save state to Delta
     d.from = m.from;
@@ -380,18 +380,18 @@ void GameState::makeMove(const Move& m, Delta& d) {
     d.castleBK = castleBK;
     d.castleBQ = castleBQ;
 
-    d.enPassant = enPassant;
-    d.halfCount = halfCount;
-    d.fullCount = fullCount;
+    d.enPassant = en_passant;
+    d.halfCount = half_moves;
+    d.fullCount = full_moves;
 
     // apply move
     // Clear from-square
-    board[mv.from] = ' ';
+    bb[mv.from] = ' ';
 
     bool isWhite = (piece >= 'A' && piece <= 'Z');
 
     // Reset en passant
-    enPassant = -1;
+    en_passant = -1;
 
     // castling
     if ((piece == 'K' && m.from == 60 && (m.to == 62 || m.to == 58)) ||
@@ -400,36 +400,36 @@ void GameState::makeMove(const Move& m, Delta& d) {
         // King moves two squares
         if (mv.to == m.from + 2) { // king-side
             // move the rook
-            board[m.from + 1] = board[m.from + 3];
-            board[m.from + 3] = ' ';
+            bb[m.from + 1] = bb[m.from + 3];
+            bb[m.from + 3] = ' ';
         } else { // queen-side
-            board[m.from - 1] = board[m.from - 4];
-            board[m.from - 4] = ' ';
+            bb[m.from - 1] = bb[m.from - 4];
+            bb[m.from - 4] = ' ';
         }
     }
 
     // en passant
     if ((piece == 'P' || piece == 'p')
-        && m.to == enPassant) {
+        && m.to == en_passant) {
 
         int capSq = isWhite ? (m.to + 8) : (m.to - 8);
-        d.capturedPiece = board[capSq];
-        board[capSq] = ' ';
+        d.capturedPiece = bb[capSq];
+        bb[capSq] = ' ';
     }
 
     // promotion
     if (m.promotion) {
-        board[m.to] = m.promotion;
+        bb[m.to] = m.promotion;
     } else {
-        board[m.to] = piece;
+        bb[m.to] = piece;
     }
 
     // set new en passant square
     if (piece == 'P') {
-        if (m.to == m.from - 16) enPassant = m.from - 8;
+        if (m.to == m.from - 16) en_passant = m.from - 8;
     }
     if (piece == 'p') {
-        if (m.to == m.from + 16) enPassant = m.from + 8;
+        if (m.to == m.from + 16) en_passant = m.from + 8;
     }
 
     // update castling
@@ -447,12 +447,12 @@ void GameState::makeMove(const Move& m, Delta& d) {
 
     // move counters
     if (piece == 'P' || piece == 'p' || target != ' ')
-        halfCount = 0;
+        half_moves = 0;
     else
-        halfCount++;
+        half_moves++;
 
     if (!white_to_move)
-        fullCount++;
+        full_moves++;
 
     // switch white to black and vice versa
     white_to_move = !white_to_move;
@@ -467,19 +467,19 @@ void GameState::unmakeMove(const Delta& d) {
     castleBK = d.castleBK;
     castleBQ = d.castleBQ;
 
-    enPassant = d.enPassant;
-    halfCount = d.halfCount;
-    fullCount = d.fullCount;
+    en_passant = d.enPassant;
+    half_moves = d.halfCount;
+    full_moves = d.fullCount;
 
-    //restore board
-    board[d.from] = d.movedPiece;
-    board[d.to] = d.capturedPiece;
+    //restore bb
+    bb[d.from] = d.movedPiece;
+    bb[d.to] = d.capturedPiece;
 
     char piece = d.movedPiece;
 
     // undo promotion
     if (d.promotionPiece) {
-        board[d.from] = (white_to_move ? 'P' : 'p');
+        bb[d.from] = (white_to_move ? 'P' : 'p');
     }
 
     // undo en passant
@@ -489,7 +489,7 @@ void GameState::unmakeMove(const Delta& d) {
 
         bool isWhite = (piece == 'P');
         int capSq = isWhite ? (d.to + 8) : (d.to - 8);
-        board[capSq] = isWhite ? 'p' : 'P';
+        bb[capSq] = isWhite ? 'p' : 'P';
     }
 
     // undo castling
@@ -497,11 +497,11 @@ void GameState::unmakeMove(const Delta& d) {
         (piece == 'k' && d.from == 4 && (d.to == 6 || d.to == 2))) {
 
         if (d.to == d.from + 2) { // king-side
-            board[d.from + 3] = board[d.from + 1];
-            board[d.from + 1] = ' ';
+            bb[d.from + 3] = bb[d.from + 1];
+            bb[d.from + 1] = ' ';
         } else { // queen-side
-            board[d.from - 4] = board[d.from - 1];
-            board[d.from - 1] = ' ';
+            bb[d.from - 4] = bb[d.from - 1];
+            bb[d.from - 1] = ' ';
         }
     }
 }

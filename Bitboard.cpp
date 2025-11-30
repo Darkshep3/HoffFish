@@ -16,6 +16,7 @@ Bitboard::Bitboard(){
     brooks = 0x0000000000000000ULL;
     bqueens = 0x0000000000000000ULL;
     bking = 0x0000000000000000ULL;
+    updatePieceBb();
 }
 
 Bitboard::Bitboard(const Bitboard& other){
@@ -31,6 +32,7 @@ Bitboard::Bitboard(const Bitboard& other){
     brooks = other.brooks;
     bqueens = other.bqueens;
     bking = other.bking;
+    updatePieceBb();
 }
 
 void Bitboard::initialize(){
@@ -46,6 +48,7 @@ void Bitboard::initialize(){
     brooks = 0x8100000000000000ULL;
     bqueens = 0x0800000000000000ULL;
     bking = 0x1000000000000000ULL;
+    updatePieceBb();
 }
 void Bitboard::display (U64 bitboard){
     for (int rank = 7; rank >= 0; rank--){
@@ -88,10 +91,30 @@ for (int rank = 7; rank >= 0; rank --){
 cout << "  a b c d e f g h" << endl;
 }
 
-void Bitboard::movePiece(U64 &bitboard, int from, int to){
-    set_bit(bitboard, to);
-    clear_bit(bitboard, from);
+void Bitboard::clearSquare(int index) {
+    U64 mask = ~(1ULL << index);
+    wpawns &= mask;
+    wknights &= mask;
+    wbishops &= mask;
+    wrooks &= mask;
+    wqueens &= mask;
+    wking &= mask;
+    bpawns &= mask;
+    bknights &= mask;
+    bbishops &= mask;
+    brooks &= mask;
+    bqueens &= mask;
+    bking &= mask;
+    updatePieceBb();
 }
+
+void Bitboard::movePiece(int from, int to, char piece){
+    if (piece == ' ') return;
+    clearSquare(from);
+    clearSquare(to);
+    placePiece(piece, to);
+}
+
 U64 Bitboard::getWhitePieces(){
     return wpawns | wknights | wbishops | wrooks | wqueens | wking;
 }
@@ -100,7 +123,7 @@ U64 Bitboard::getBlackPieces(){
     return bpawns | bknights | bbishops | brooks | bqueens | bking;
 }
 
-void Bitboard::charToBit(char piece, int index) {
+void Bitboard::placePiece(char piece, int index) {
         U64 bit = 1ULL << index;
         switch (piece) {
             case 'P':
@@ -140,7 +163,7 @@ void Bitboard::charToBit(char piece, int index) {
                 bking |= bit;
                 break;
         }
-        // displayBoard();
+        updatePieceBb();
     }
 
     U64 Bitboard::getOccupied(){
@@ -148,4 +171,27 @@ void Bitboard::charToBit(char piece, int index) {
     }
     U64 Bitboard::getEmpty(){
         return ~getOccupied();
+    }
+    char Bitboard::getPieceAt(int index) {
+        U64 bit = 1ULL << index;
+        for (int i = 0; i < 12; i++) {
+            if ((pieceBb[i] & bit) != 0) {
+                return pieceChars[i];
+            }
+        }
+        return ' ';
+    }
+    void Bitboard::updatePieceBb() {
+        pieceBb[0] = wpawns;
+        pieceBb[1] = wknights;
+        pieceBb[2] = wbishops;
+        pieceBb[3] = wrooks;
+        pieceBb[4] = wqueens;
+        pieceBb[5] = wking;
+        pieceBb[6] = bpawns;
+        pieceBb[7] = bknights;
+        pieceBb[8] = bbishops;
+        pieceBb[9] = brooks;
+        pieceBb[10] = bqueens;
+        pieceBb[11] = bking;
     }
