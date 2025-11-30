@@ -6,16 +6,13 @@
 
 class MoveGenerator {
 public: 
+//Diana
     static vector<Move> generateLegalMoves(GameState& state);
     static vector<Move> generatePseudoMoves(const GameState& state);
 private:
     static void generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
-<<<<<<< HEAD
-    static void generateKnightMoves(Bitboard& bb,  U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
+    static void generateKnightMoves(Bitboard& bb,  U64 allies, bool isWhiteToMove, vector<Move>& moves);
     static void generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
-=======
-    static void generateKnightMoves(Bitboard& bb, long allies, bool isWhiteToMove, vector<Move>& moves);
->>>>>>> refs/remotes/origin/main
     static void generateKingMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves);
     //static void generateSlidingMoves(Bitboard& bb, bool white, vector<Move>& moves);
     static bool isAttackedSquare(Bitboard& bb, int square, bool isWhite);

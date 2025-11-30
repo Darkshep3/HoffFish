@@ -167,14 +167,14 @@ class GameState{
 
         };
 
-void GameState::loadFEN(const string& str){
-    //TODO: MUST CLEAR BITBOARD BEFORE RUNNING THIS CODE
+    void GameState::loadFEN(const string& str){
+       //TODO: MUST CLEAR BITBOARD BEFORE RUNNING THIS CODE
 
-    //Sample FEN: rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq d6 0 3
+       //Sample FEN: rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq d6 0 3
 
-    //break FEN into sections by spaces
-    istringstream strm;
-    strm.str(str);
+        //break FEN into sections by spaces
+        istringstream strm;
+        strm.str(str);
 
     string boardSection;
     char nextToMove;
@@ -591,3 +591,4 @@ void GameState::unmakeMove() {
 
     white_to_move = !white_to_move;
 }
+};
