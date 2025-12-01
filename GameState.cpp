@@ -239,151 +239,168 @@ string GameState::exportFEN(){
 
 }
 
-/*void GameState::makeMove(const Move& m, Delta& d) {
-    char piece = bb[m.from];
-    char target = bb[m.to];
+void GameState::makeMove(Move move) {
 
-    // save state to Delta
-    d.from = m.from;
-    d.to = m.to;
-    d.movedPiece = piece;
-    d.capturedPiece = target;
-    d.promotionPiece = m.promotion;
+    int from = move.getFromSquare();
+    int to = move.getToSquare();
+    MoveType type = move.getMoveType();
+    char piece = bb.getPieceAt(from);
+    char captured = bb.getPieceAt(to);
+    char promo = move.getPromotionPiece();
 
-    d.white_to_move = white_to_move;
-
-    d.castleWK = castleWK;
-    d.castleWQ = castleWQ;
-    d.castleBK = castleBK;
-    d.castleBQ = castleBQ;
-
-    d.enPassant = en_passant;
-    d.halfCount = half_moves;
-    d.fullCount = full_moves;
-
-    // apply move
-    // Clear from-square
-    bb[mv.from] = ' ';
-
-    bool isWhite = (piece >= 'A' && piece <= 'Z');
-
-    // Reset en passant
+    // clear any en-passant from previous turn
     en_passant = -1;
 
-    // castling
-    if ((piece == 'K' && m.from == 60 && (m.to == 62 || m.to == 58)) ||
-        (piece == 'k' && m.from == 4 && (m.to == 6 || m.to == 2))) {
-
-        // King moves two squares
-        if (mv.to == m.from + 2) { // king-side
-            // move the rook
-            bb[m.from + 1] = bb[m.from + 3];
-            bb[m.from + 3] = ' ';
-        } else { // queen-side
-            bb[m.from - 1] = bb[m.from - 4];
-            bb[m.from - 4] = ' ';
-        }
+    // remove captured piece first (except en passant, addressed later)
+    if (captured != ' ' && type != MoveType::EN_PASSANT) {
+        bb.clearSquare(to);
+        half_moves = 0;   // capture resets halfmove counter
     }
 
     // en passant
-    if ((piece == 'P' || piece == 'p')
-        && m.to == en_passant) {
+    if (type == MoveType::EN_PASSANT) {
+        int capSq = white_to_move ? (to - 8) : (to + 8);
+        bb.clearSquare(capSq);
+        half_moves = 0;
+    }
 
-        int capSq = isWhite ? (m.to + 8) : (m.to - 8);
-        d.capturedPiece = bb[capSq];
-        bb[capSq] = ' ';
+    // half_move counter
+    if (piece == 'P' || piece == 'p') {
+        half_moves = 0;
+    } else {
+        half_moves++;
+    }
+
+    // full move counter
+    if (!white_to_move) full_moves++;
+
+    // move piece
+    bb.clearSquare(from);
+
+    // castling
+    if (type == MoveType::CASTLING) {
+        // king side
+        if (to == from + 2) {
+            if (white_to_move) {
+                bb.clearSquare(7);
+                bb.placePiece('R', 5);
+            } else {
+                bb.clearSquare(63);
+                bb.placePiece('r', 61);
+            }
+        }
+        // queen side
+        else if (to == from - 2) {
+            if (white_to_move) {
+                bb.clearSquare(0);
+                bb.placePiece('R', 3);
+            } else {
+                bb.clearSquare(56);
+                bb.placePiece('r', 59);
+            }
+        }
     }
 
     // promotion
-    if (m.promotion) {
-        bb[m.to] = m.promotion;
+    if (move.isPromotion()) {
+        bb.placePiece(promo, to);
     } else {
-        bb[m.to] = piece;
+        bb.placePiece(piece, to);
     }
 
-    // set new en passant square
-    if (piece == 'P') {
-        if (m.to == m.from - 16) en_passant = m.from - 8;
+    // pawn double push: set en-passant square 
+    if (piece == 'P' && from / 8 == 1 && to == from + 16) {
+        en_passant = from + 8;
     }
-    if (piece == 'p') {
-        if (m.to == m.from + 16) en_passant = m.from + 8;
-    }
-
-    // update castling
-    if (piece == 'K') {
-        castleWK = castleWQ = false;
-    }
-    if (piece == 'k') {
-        castleBK = castleBQ = false;
+    if (piece == 'p' && from / 8 == 6 && to == from - 16) {
+        en_passant = from - 8;
     }
 
-    if (m.from == 63 || m.to == 63) castleWK = false;
-    if (m.from == 56 || m.to == 56) castleWQ = false;
-    if (m.from == 7  || m.to == 7)  castleBK = false;
-    if (m.from == 0  || m.to == 0)  castleBQ = false;
+    // update castling rights
+    if (piece == 'K') { castleWK = castleWQ = false; }
+    if (piece == 'k') { castleBK = castleBQ = false; }
 
-    // move counters
-    if (piece == 'P' || piece == 'p' || target != ' ')
-        half_moves = 0;
-    else
-        half_moves++;
+    if (from == 0 || to == 0) castleWQ = false;
+    if (from == 7 || to == 7) castleWK = false;
+    if (from == 56 || to == 56) castleBQ = false;
+    if (from == 63 || to == 63) castleBK = false;
 
-    if (!white_to_move)
-        full_moves++;
-
-    // switch white to black and vice versa
+    // change sides to move
     white_to_move = !white_to_move;
 }
 
-void GameState::unmakeMove(const Delta& d) {
-    // restore side to move and counters
-    white_to_move = d.white_to_move;
+void GameState::unmakeMove(Delta d) {
 
+    // restore global state
+    white_to_move = d.white_to_move;
     castleWK = d.castleWK;
     castleWQ = d.castleWQ;
     castleBK = d.castleBK;
     castleBQ = d.castleBQ;
-
     en_passant = d.enPassant;
     half_moves = d.halfCount;
     full_moves = d.fullCount;
 
-    //restore bb
-    bb[d.from] = d.movedPiece;
-    bb[d.to] = d.capturedPiece;
+    MoveType type = d.moveType;
 
-    char piece = d.movedPiece;
+    // remove piece from moved to square
+    bb.clearSquare(d.to);
 
     // undo promotion
-    if (d.promotionPiece) {
-        bb[d.from] = (white_to_move ? 'P' : 'p');
+    if (type == MoveType::PROMOTION_QUEEN ||
+        type == MoveType::PROMOTION_ROOK ||
+        type == MoveType::PROMOTION_BISHOP ||
+        type == MoveType::PROMOTION_KNIGHT) 
+    {
+        // restore pawn
+        char pawn = (d.movedPiece == 'P' ? 'P' : 'p');
+        bb.placePiece(pawn, d.from);
+    }
+    else {
+        // restore piece on original square
+        bb.placePiece(d.movedPiece, d.from);
     }
 
-    // undo en passant
-    if ((piece == 'P' || piece == 'p')
-        && d.to == d.enPassant
-        && d.capturedPiece == ' ') {
-
-        bool isWhite = (piece == 'P');
-        int capSq = isWhite ? (d.to + 8) : (d.to - 8);
-        bb[capSq] = isWhite ? 'p' : 'P';
+    // restore captured piece
+    if (d.capturedPiece != ' ') {
+        // normal capture
+        if (type != MoveType::EN_PASSANT) {
+            bb.placePiece(d.capturedPiece, d.to);
+        }
+        // en passant
+        else {
+            int capSq = (d.movedPiece == 'P' ? d.to - 8 : d.to + 8);
+            bb.placePiece(d.capturedPiece, capSq);
+        }
     }
 
     // undo castling
-    if ((piece == 'K' && d.from == 60 && (d.to == 62 || d.to == 58)) ||
-        (piece == 'k' && d.from == 4 && (d.to == 6 || d.to == 2))) {
-
-        if (d.to == d.from + 2) { // king-side
-            bb[d.from + 3] = bb[d.from + 1];
-            bb[d.from + 1] = ' ';
-        } else { // queen-side
-            bb[d.from - 4] = bb[d.from - 1];
-            bb[d.from - 1] = ' ';
+    if (type == MoveType::CASTLING) {
+        if (d.movedPiece == 'K') {
+            // king side
+            if (d.to == d.from + 2) {
+                bb.clearSquare(5);
+                bb.placePiece('R', 7);
+            }
+            // queen side
+            else if (d.to == d.from - 2) {
+                bb.clearSquare(3);
+                bb.placePiece('R', 0);
+            }
+        }
+        else if (d.movedPiece == 'k') {
+            if (d.to == d.from + 2) {
+                bb.clearSquare(61);
+                bb.placePiece('r', 63);
+            }
+            else if (d.to == d.from - 2) {
+                bb.clearSquare(59);
+                bb.placePiece('r', 56);
+            }
         }
     }
 }
 
-*/
 
 /*Commenting out for now or else program wont run
 //Makes a move but stores previous positional state
