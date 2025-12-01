@@ -1,16 +1,13 @@
+#pragma once
 #include <iostream>
-#include <string>
-#include <sstream>
 #include "Bitboard.h"
-#include "GameState.h"
-
+#include <string>
 using namespace std;
 
 //write all the functions needed in GameState using gamestate.h's skeleton! 
-
 class GameState{
     public: 
-        Bitboard bb;
+        Bitboard board;
         bool white_to_move;
         bool castleWK, castleWQ;
         bool castleBK, castleBQ;
@@ -30,11 +27,10 @@ class GameState{
             int en_passant = -1;
             full_moves = 0;
             half_moves = 0;
-            bb = Bitboard();
+            board = new Bitboard();
         }; //Diana
         explicit GameState(const string fen)
         {
-            //first split into the 6 parts
             string fen_copy = fen;
             int length = fen.length();
             string fen_info[6];
@@ -50,33 +46,14 @@ class GameState{
             {
                 
                 //while we can find a space
-                fen_info[i]= fen_copy.substr(0, space_index);
+                fen_info[i]= fen_copy.substr(0, space_index + 1);
                 //cut down the part we stored
-                fen_copy = fen_copy.substr(space_index + 1);
+                fen_copy = fen_copy.substr(space_index + 1, length - (space_index + 1));
                 //get a new index for the next space
                 space_index = fen_copy.find(" ");
             }
-
-            fen_info[5] = fen_copy;
-
-
-            //now take piece placement and then separate line by line (separeted by / )
-            string piece_placement[8];
-            int slash_index = fen_info[0].find("/"); 
-            for(int i = 0; slash_index != string::npos; i++)
-            {
-                
-                //while we can find a slash
-                piece_placement[i]= fen_info[0].substr(0, slash_index);
-                //cut down the part we stored
-                fen_info[0] = fen_info[0].substr(slash_index + 1);
-                //get a new index for the next slash
-                slash_index = fen_info[0].find("/");
-            }
-
-            piece_placement[7] = fen_info[0];
-
-            //translate from fen to game state :d
+            
+            //translate from fen to game state
 
             //pieces on the board (0)
             //loop thru each position and if it's not empty then set the bit

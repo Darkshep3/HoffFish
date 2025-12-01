@@ -62,10 +62,10 @@ inline constexpr array<U64, 64> KNIGHTMOVES = [] {
     return arr;
 }();
 
-inline U64 getKingMoves(int square, long allies){
+inline U64 getKingMoves(int square, U64 allies){
     return KINGMOVES[square] & ~ allies;
 }
 
-inline U64 getKnightMoves(int square, long allies){
+inline U64 getKnightMoves(int square, U64 allies){
     return KNIGHTMOVES[square] & ~ allies;
 }

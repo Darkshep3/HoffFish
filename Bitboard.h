@@ -16,15 +16,22 @@ class Bitboard {
 public:
     U64 wpawns, wknights, wbishops, wrooks, wqueens, wking;
     U64 bpawns, bknights, bbishops, brooks, bqueens, bking;
+    U64 pieceBb[64];
+    char pieceChars[12] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'};
 
     Bitboard();
     Bitboard(const Bitboard& other);
-    void initialize();
     void display(U64 bitboard);
+    void initialize();
+    void updatePieceBb(); 
     void displayBoard();
-    void movePiece(U64 &bitboard, int from, int to);
-    void charToBit(char piece, int index);
+    void clearSquare(int index);
+    void movePiece(int from, int to, char piece);
+    void placePiece(char piece, int index);
     U64 getWhitePieces();
     U64 getBlackPieces();
     // void setBit(char piece, int index);
+    U64 getOccupied();
+    U64 getEmpty();
+    char getPieceAt(int index);
 };

@@ -2,7 +2,101 @@
 bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
 
 }
-void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
+
+vector<Move> MoveGenerator::generatePseudoMoves(const GameState& state, const Bitboard& board)
+{
+    //list of moves we return
+    vector<Move> moves;
+    //find active color
+    if(state.white_to_move)
+    {
+        //enemy bb
+        U64 enemy = board.bpawns | board.bknights | board.bbishops | board.brooks | board.bqueens | board.bking;
+        //ally bb
+        U64 ally = board.wpawns | board.wknights | board.wbishops | board.wrooks | board.wqueens | board.wking;
+        //empty bb
+        U64 empty = ~(ally | enemy);  
+        //loop through all that side’s pieces
+
+        //pawns
+        generatePawnMoves(board, enemy, empty, state.en_passant, true, moves);
+        //true bc white is already checked to be active here
+
+        //knights
+        generateKnightMoves(board, ally, true, moves);
+
+        //bishops
+        generateBishopMoves(board, enemy, empty, true, moves);
+
+        //rooks
+        //to be coded
+        generateRookMoves(board, enemy, empty, true, moves);
+
+        //queens
+        //to be coded
+        generateQueenMoves(board, enemy, empty, true, moves);
+
+        //king
+        generateKingMoves(board, ally, empty, true, state.castleWK, state.castleWQ, moves);
+        
+        
+    }else
+    {
+        //ally bb
+        U64 ally = board.bpawns | board.bknights | board.bbishops | board.brooks | board.bqueens | board.bking;
+        //enemy bb
+        U64 enemy = board.wpawns | board.wknights | board.wbishops | board.wrooks | board.wqueens | board.wking;
+        //empty bb
+        U64 empty = ~(ally | enemy);  
+        //loop through all that side’s pieces
+
+        //pawns
+        generatePawnMoves(board, enemy, empty, state.en_passant, false, moves);
+        //true bc white is already checked to be active here
+
+        //knights
+        generateKnightMoves(board, ally, false, moves);
+
+        //bishops
+        generateBishopMoves(board, enemy, empty, false, moves);
+
+        //rooks
+        //to be coded
+        generateRookMoves(board, enemy, empty, false, moves);
+
+        //queens
+        //to be coded
+        generateQueenMoves(board, enemy, empty, false, moves);
+
+        //king
+        generateKingMoves(board, ally, empty, false, state.castleBK, state.castleBQ, moves);
+    }
+    
+    //return vector
+    return moves;
+}
+
+vector<Move> MoveGenerator::generateLegalMoves(const GameState& state, const Bitboard& board)
+{
+    //obtain list of pseudo moves
+    vector<Move> pseudo_moves = generatePseudoMoves(state, board);
+    //empty list of legal moves
+    vector<Move> legal_moves;
+    for(const Move m: pseudo_moves)
+    {
+        //make move and check legality
+        state.makeMove(m.to, m.from, m.promotionPiece);
+        
+        //if legal, store to legal_moves
+        //unmake move
+    }
+    
+
+
+}
+
+
+void MoveGenerator::generateKingMoves(const Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
     U64 temp = getKingMoves(fromSq, allies);
@@ -35,91 +129,117 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, long allies, long empty, boo
 }
 
 //Diana 
-void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generateKnightMoves(const Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
-    U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
-    
-    //loop thru each knight
-    while(knights != 0)
-    {
-        int from_sq = get_LSB(knights);
-        clear_LSB(knights);
-        //remove current knight from bitboard
+   U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
 
-        U64 temp = getKnightMoves(from_sq, allies);
+   //loop thru each knight
+   while(knights != 0)
+   {
+       int from_sq = get_LSB(knights);
+       clear_LSB(knights);
+       //remove current knight from bitboard
 
-        while(temp != 0)
-        {
+
+       U64 temp = getKnightMoves(from_sq, allies);
+
+
+       while(temp != 0)
+       {
             int to_sq = get_LSB(temp);
             clear_LSB(temp);
+        
 
             moves.push_back(Move(from_sq,to_sq));
-        }
-    }
+       }
+   }
 }
-
 
 //Ethan  
 
-void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves) {
+void MoveGenerator::generatePawnMoves(const Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
+{
     U64 pawns = isWhiteToMove ? bb.wpawns : bb.bpawns;
-    int direction = isWhiteToMove ? 8 : -8; // white moves up, black moves down
-    int startRank = isWhiteToMove ? 1 : 6;  // 2nd rank for white, 7th for black
-    int promoRank = isWhiteToMove ? 6 : 1;  // 7th for white, 2nd for black
+    int direction = isWhiteToMove ? 8 : -8;
+    int startRank = isWhiteToMove ? 1 : 6;
+    int promoRank = isWhiteToMove ? 6 : 1;
 
-    while (pawns != 0) {
+    char promoQ = isWhiteToMove ? 'Q' : 'q';
+    char promoR = isWhiteToMove ? 'R' : 'r';
+    char promoB = isWhiteToMove ? 'B' : 'b';
+    char promoN = isWhiteToMove ? 'N' : 'n';
+
+    while (pawns != 0)
+    {
         int fromSq = get_LSB(pawns);
         clear_LSB(pawns);
 
         int rank = fromSq / 8;
         int file = fromSq % 8;
 
-        int toSq = fromSq + direction;
-
-        // Single move forward
-        if (toSq >= 0 && toSq < 64 && ((1ULL << toSq) & (bb.getWhitePieces() | bb.getBlackPieces())) == 0) {
+        int oneStep = fromSq + direction;
+        int twoStep = fromSq + 2*direction;
+        // Pushes
+        if (oneStep >= 0 && oneStep < 64 && ((empty >> oneStep) & 1ULL))
+        {
             // Promotion
-            if (rank == promoRank) {
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'Q' : 'q'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'R' : 'r'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'B' : 'b'));
-                moves.push_back(Move(fromSq, toSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'N' : 'n'));
-            } else {
-                moves.push_back(Move(fromSq, toSq, MoveType::NORMAL));
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, oneStep, MoveType::PROMOTION_KNIGHT,promoN));
+            }
+            else
+            {
+                moves.push_back(Move(fromSq, oneStep));
             }
 
-            // Double move forward
-            if (rank == startRank) {
-                int doubleTo = fromSq + 2 * direction;
-                if (((1ULL << doubleTo) & (bb.getWhitePieces() | bb.getBlackPieces())) == 0) {
-                    moves.push_back(Move(fromSq, doubleTo, MoveType::DOUBLE_PAWN_PUSH));
-                }
+            // Double push
+            if (rank == startRank && ((empty >> twoStep) & 1ULL))
+            {
+                moves.push_back(Move(fromSq, twoStep));
             }
         }
-
         // Captures
-        int captureOffsets[2] = { direction + 1, direction - 1 }; // right and left diagonals
-        for (int i = 0; i < 2; i++) {
-            int capSq = fromSq + captureOffsets[i];
-            if (capSq < 0 || capSq >= 64) continue;
-
-            int capFile = capSq % 8;
-            if (abs(capFile - file) != 1) continue; // avoid wrap-around (such as capturing from h file to a file)
-
-            if ((1ULL << capSq) & enemy) { // normal capture
-                if (rank == promoRank) { // promotion capture
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'Q' : 'q'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'R' : 'r'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'B' : 'b'));
-                    moves.push_back(Move(fromSq, capSq, MoveType::PROMOTION, 0, isWhiteToMove ? 'N' : 'n'));
-                } else {
-                    moves.push_back(Move(fromSq, capSq, MoveType::CAPTURE));
-                }
+        int capLeft = fromSq + direction - 1;
+        int capRight = fromSq + direction + 1;
+        // Left capture
+        if (file != 0 && capLeft >= 0 && capLeft < 64 && ((enemy >> capLeft) & 1ULL))
+        {
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, capLeft, MoveType::PROMOTION_KNIGHT,promoN));
             }
-
-            // En passant
-            if (capSq == enPassant) {
-                moves.push_back(Move(fromSq, capSq, MoveType::EN_PASSANT));
+            else
+            {
+                moves.push_back(Move(fromSq, capLeft, MoveType::CAPTURES));
+            }
+        }
+        // Right capture
+        if (file != 7 && capRight >= 0 && capRight < 64 && ((enemy >> capRight) & 1ULL))
+        {
+            if (rank == promoRank)
+            {
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_QUEEN, promoQ));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_ROOK,  promoR));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_BISHOP,promoB));
+                moves.push_back(Move(fromSq, capRight, MoveType::PROMOTION_KNIGHT,promoN));
+            }
+            else
+            {
+                moves.push_back(Move(fromSq, capRight, MoveType::CAPTURES));
+            }
+        }
+        // En Passant
+        if (enPassant != -1)
+        {
+            if (capLeft == enPassant || capRight == enPassant)
+            {
+                moves.push_back(Move(fromSq, enPassant, MoveType::EN_PASSANT));
             }
         }
     }
@@ -129,7 +249,7 @@ void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int en
 //Arush 
 //Bishop Move Generatoin 
 // Rooks + queens if you have time  
-void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+void MoveGenerator::generateBishopMoves(const Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
     U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
     vector<int> fromSqs;
     while (bishops != 0) {
@@ -162,6 +282,13 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool
             }
         }
     }
-
+    //Arush 
+    //generate rook moves + queens
+    //queen = rook + bishops 
+    /*MoveGenerator::generateQueensMoves(...){
+        movegenerator:generatebishopMoves()
+        movegenerator:generaterookMoves() 
+    }
+    */ 
 }
 

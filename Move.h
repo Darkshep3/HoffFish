@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-
+#include <string>
 enum class MoveType {
     NORMAL,
     CASTLING,
@@ -14,33 +14,59 @@ enum class MoveType {
 
 class Move{
 public:
-    int fromSquare;
-    int toSquare;
-    char capturedPiece;
-    char promotionPiece;
+    int from;
+    int to;
+    char captured;
+    char promotion;
     MoveType moveType;
 
     //the constructor
-    Move(int from, int to);
-    Move(int from, int to, MoveType type);
-    Move(int from, int to, MoveType type, char promotion);
+    Move(int from, int to)
+    {
+        this-> from = from;
+        this-> to = to;
+        moveType = MoveType::NORMAL;
+        captured = ' ';
+        promotion = ' ';
+    }
+
+    Move(int from, int to, MoveType type)
+    {
+        this-> from = from;
+        this-> to = to;
+        this -> moveType = type;
+        captured = ' ';
+        promotion = ' ';
+    }
+
+    Move(int from, int to, MoveType type, char promotion)
+    {
+        this-> from = from;
+        this-> to = to;
+        this-> moveType = type;
+        captured = ' ';
+        this-> promotion = promotion;
+    }
+
 
     int getFromSquare() const{
-        return fromSquare;
+        return from;
     }
     int getToSquare() const {
-        return toSquare;
+        return to;
     }
 
     char getCapturedPiece() const {
-        return capturedPiece;
+        return captured;
     }
     char getPromotionPiece() const{
-        return promotionPiece;
+        return promotion;
     }
     MoveType getMoveType() const {
         return moveType;
     }
+
+
 private:
     MoveType getPromotionMoveType(char promotion){
         switch(promotion){
