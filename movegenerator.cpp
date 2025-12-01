@@ -1,11 +1,12 @@
 #include "movegenerator.h"
 bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
-
+    //in progress
+    return true;
 }
 void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
-    U64 temp = getKingMoves(fromSq, allies);
+    U64 temp = getKingAttacks(fromSq, allies);
     while (temp != 0){
         moves.push_back(Move(fromSq, get_LSB(temp)));
     }
@@ -47,7 +48,7 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteTo
        //remove current knight from bitboard
 
 
-       U64 temp = getKnightMoves(from_sq, allies);
+       U64 temp = getKnightAttacks(from_sq, allies);
 
 
        while(temp != 0)

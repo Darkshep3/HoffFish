@@ -65,6 +65,17 @@ public:
     MoveType getMoveType() const {
         return moveType;
     }
+    std::string squareToAlgebraic(int sq) const{
+        if (sq < 0 || sq > 63){
+            return "-";
+        }
+        char file = (char) ('a' + (sq % 8));
+        char rank = (char) ('1' + (sq / 8));
+        std::string s;
+        s += file;
+        s += rank;
+        return s;
+    }
 
 
 private:

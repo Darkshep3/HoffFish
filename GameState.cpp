@@ -36,7 +36,7 @@ GameState::GameState(const string& fen)
     // string half_moves;
     // string full_moves;
     int space_index = fen_copy.find(" "); 
-    for(int i = 0; space_index != string::npos; i++)
+    for(int i = 0; space_index != string::npos; i++) 
     {
         
         //while we can find a space
@@ -160,129 +160,6 @@ GameState::GameState(const string& fen)
 
 };
 
-void GameState::loadFEN(const string& str){
-    //TODO: MUST CLEAR BITBOARD BEFORE RUNNING THIS CODE
-
-    //Sample FEN: rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq d6 0 3
-
-    //break FEN into sections by spaces
-    istringstream strm;
-    strm.str(str);
-
-    string bbSection;
-    char nextToMove;
-    string castleSection;
-    string enPassantSection;
-
-    strm >> bbSection >> nextToMove >> castleSection >> enPassantSection >> half_moves >> full_moves;
-
-    //set bitbb from bb data
-    int square = 56;
-    for (int i=0; i<bbSection.length(); i++) {
-        switch (bbSection[i]) {
-            case 'r':
-                bb.brooks |= (1ULL << square);
-                square++;
-                break;
-            case 'n':
-                bb.bknights |= (1ULL << square);
-                square++;
-                break;
-            case 'b':
-                bb.bbishops |= (1ULL << square);
-                square++;
-                break;
-            case 'q':
-                bb.bqueens |= (1ULL << square);
-                square++;
-                break;
-            case 'k':
-                bb.bking |= (1ULL << square);
-                square++;
-                break;
-            case 'p':
-                bb.bpawns |= (1ULL << square);
-                square++;
-                break; 
-            case 'R':
-                bb.wrooks |= (1ULL << square);
-                square++;
-                break;
-            case 'N':
-                bb.wknights |= (1ULL << square);
-                square++;
-                break;
-            case 'B':
-                bb.wbishops |= (1ULL << square);
-                square++;
-                break;
-            case 'Q':
-                bb.wqueens |= (1ULL << square);
-                square++;
-                break;
-            case 'K':
-                bb.wking |= (1ULL << square);
-                square++;
-                break;
-            case 'P':
-                bb.wpawns |= (1ULL << square);
-                square++;
-                break; 
-            case '1':
-                square += 1;
-                break;
-            case '2':
-                square += 2;
-                break;
-            case '3':
-                square += 3;
-                break;
-            case '4':
-                square += 4;
-                break;
-            case '5':
-                square += 5;
-                break;
-            case '6':
-                square += 6;
-                break;
-            case '7':
-                square += 7;
-                break;
-            case '8':
-                square += 8;
-                break;
-            case '/':
-                square -= 16;
-
-        }
-    }
-
-    //set white to move or not
-    white_to_move = (nextToMove == 'w');
-
-    //set castling variables
-    castleWK = (castleSection.find('K') != string::npos);
-    castleWQ = (castleSection.find('Q') != string::npos);
-    castleBK = (castleSection.find('k') != string::npos);
-    castleBQ = (castleSection.find('q') != string::npos);
-
-    //set en passant square (if it exists)
-    if (enPassantSection != "-") {
-        strm.clear();
-        strm.str(enPassantSection);
-        char file;
-        int rank;
-        strm >> file >> rank;
-
-        square = (file - 97) + 8 * (rank - 1);
-        en_passant = 1ULL << square;
-    } else {
-        en_passant = 0ULL;
-    }
-    
-}
-
 string GameState::exportFEN(){
 
     ostringstream strm;
@@ -345,7 +222,7 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write en passant square (if it exists)
-    if (en_passant) {
+    if (en_passant != -1) {
         int square = __builtin_ctzll(en_passant);
         int rank = square / 8; // 0-7
         int file = square % 8; // 0-7
@@ -362,7 +239,7 @@ string GameState::exportFEN(){
 
 }
 
-void GameState::makeMove(const Move& m, Delta& d) {
+/*void GameState::makeMove(const Move& m, Delta& d) {
     char piece = bb[m.from];
     char target = bb[m.to];
 
@@ -506,3 +383,28 @@ void GameState::unmakeMove(const Delta& d) {
     }
 }
 
+*/
+
+//Makes a move but stores previous positional state
+Delta GameState::deltaMove (Move move){
+    int from = move.getFromSquare();
+    int to = move.getToSquare();
+    char piece = bb.getPieceAt(from);
+    char captured;
+    MoveType moveType = move.getMoveType();
+    char promoPiece = move.getPromotionPiece();
+    if (moveType == MoveType::EN_PASSANT){
+        captured = white_to_move ? 'p' : 'P';
+    }
+    else if (move.isPromotion()){
+        captured = bb.getPieceAt(to);
+    }
+    else {
+        captured = bb.getPieceAt(to);
+    }
+    Delta delta = Delta(from, to, piece, captured, promoPiece, white_to_move, castleWK,
+    castleWQ, castleBK, castleBQ, en_passant, half_moves, full_moves, moveType);
+    makeMove(move);
+    return delta;
+};
+    

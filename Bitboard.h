@@ -16,7 +16,7 @@ class Bitboard {
 public:
     U64 wpawns, wknights, wbishops, wrooks, wqueens, wking;
     U64 bpawns, bknights, bbishops, brooks, bqueens, bking;
-    U64 pieceBb[64];
+    U64 pieceBb[12];
     char pieceChars[12] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'};
 
     Bitboard();

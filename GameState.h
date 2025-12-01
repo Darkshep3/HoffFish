@@ -19,12 +19,10 @@ class GameState{
         GameState(); //Diana
         GameState(const string& fen); //Load from FEN string, Diana 
 
-        void loadFEN(const string& str);
-
         string exportFEN(); 
 
         void makeMove(Move move);
         void unmakeMove(const Delta& d); // medium task #6 Ethan 
-
+        Delta deltaMove(Move move); //essentially runs make move but leaves behind the copy of the original position 
 
 };
