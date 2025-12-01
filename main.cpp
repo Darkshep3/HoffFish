@@ -6,7 +6,6 @@
 using namespace std;
 void testing();
 void printMoves(const vector<Move>& moves);
-string squareToAlgebraic(int sq);
 
 int main ()
 {

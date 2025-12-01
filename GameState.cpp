@@ -385,6 +385,7 @@ void GameState::unmakeMove(const Delta& d) {
 
 */
 
+/*Commenting out for now or else program wont run
 //Makes a move but stores previous positional state
 Delta GameState::deltaMove (Move move){
     int from = move.getFromSquare();
@@ -408,3 +409,4 @@ Delta GameState::deltaMove (Move move){
     return delta;
 };
     
+*/
