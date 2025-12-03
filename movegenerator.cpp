@@ -157,6 +157,7 @@ void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int en
 //Bishop Move Generatoin 
 // Rooks + queens if you have time  
 void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+    //create vector of squares that contain the current player's bishops
     U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
     vector<int> fromSqs;
     while (bishops != 0) {
@@ -164,31 +165,108 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool
         clear_bit(bishops, get_LSB(bishops));
     }
 
+    //iterate through each bishop
     for (int i=0; i<fromSqs.size(); i++) {
         int fromSq = fromSqs[i];
         int rank = fromSq / 8;
         int file = fromSq % 8;
+
+        //iterate through each diagonal direction
         for (int j=-1; j<=1; j+=2) {
             for (int k=-1; k<=1; k+=2) {
-                int mult = 1;
-                int toRank = rank + j * mult;
-                int toFile = file + k * mult; 
+                int toRank = rank + j;
+                int toFile = file + k; 
                 while (toRank >= 0 && toRank <= 7 && toFile >= 0 && toFile <= 7) {
                     if (((1ULL << (toRank * 8 + toFile)) & enemy) != 0) {
+                        //if the square has an enemy, add capture move and exit loop
                         moves.push_back(Move(fromSq, toRank * 8 + toFile, MoveType::CAPTURES));
                         toRank = 9;
                     } else if (((1ULL << (toRank * 8 + toFile)) & empty) != 0){
+                        //if the square is empty, add normal move and continue iterating
                         moves.push_back(Move(fromSq, toRank * 8 + toFile, MoveType::NORMAL));
-                        mult++;
-                        toRank = rank + j * mult;
-                        toFile = file + k * mult;                         
+                        toRank += j;
+                        toFile += k;                         
                     } else {
+                        //if the square has an ally, exit loop
                         toRank = 9;
                     }
                 }
             }
         }
     }
+}
+
+
+void MoveGenerator::generateRookMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+    //create vector of squares that contain the current player's rooks
+    U64 rooks = isWhiteToMove ? bb.wrooks : bb.brooks;
+    vector<int> fromSqs;
+    while (rooks != 0) {
+        fromSqs.push_back(get_LSB(rooks));
+        clear_bit(rooks, get_LSB(rooks));
+    }
+
+    //iterate through each rook
+    for (int i=0; i<fromSqs.size(); i++) {
+        int fromSq = fromSqs[i];
+        int rank = fromSq / 8;
+        int file = fromSq % 8;
+
+        //iterate through possible vertical moves: (j=-1 means downwards, j=1 means upwards)
+        for (int j=-1; j<=1; j+=2) {
+            int toRank = rank + j;
+            while (toRank >= 0 && toRank <= 7) {
+                if (((1ULL << (toRank * 8 + file)) & enemy) != 0) {
+                    //if the square has an enemy, add capture move and exit loop
+                    moves.push_back(Move(fromSq, toRank * 8 + file, MoveType::CAPTURES));
+                    toRank = 9;
+                } else if (((1ULL << (toRank * 8 + file)) & empty) != 0){
+                    //if the square is empty, add normal move and continue iterating
+                    moves.push_back(Move(fromSq, toRank * 8 + file, MoveType::NORMAL));
+                    toRank += j;                      
+                } else {
+                    //if the square has an ally, exit loop
+                    toRank = 9;
+                }
+            }
+        }
+
+        //iterate through possible horizontal moves: (j=-1 means left, j=1 means right)
+        for (int j=-1; j<=1; j+=2) {
+            int toFile = file + j;
+            while (toFile >= 0 && toFile <= 7) {
+                if (((1ULL << (rank * 8 + toFile)) & enemy) != 0) {
+                    //if the square has an enemy, add capture move and exit loop
+                    moves.push_back(Move(fromSq, rank * 8 + toFile, MoveType::CAPTURES));
+                    toFile = 9;
+                } else if (((1ULL << (rank * 8 + toFile)) & empty) != 0){
+                    //if the square is empty, add normal move and continue iterating
+                    moves.push_back(Move(fromSq, rank * 8 + toFile, MoveType::NORMAL));
+                    toFile += j;                      
+                } else {
+                    //if the square has an ally, exit loop
+                    toFile = 9;
+                }
+            }
+        }
+    }
+}
+
+
+
+void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
+    generateBishopMoves(bb, enemy, empty, isWhiteToMove, moves);
+    generateRookMoves(bb, enemy, empty, isWhiteToMove, moves);
+}
+
+
+
+
+
+
+
+
+
     //Arush 
     //generate rook moves + queens
     //queen = rook + bishops 
@@ -197,5 +275,3 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool
         movegenerator:generaterookMoves() 
     }
     */ 
-}
-
