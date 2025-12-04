@@ -22,7 +22,7 @@ void play(){
 void testing() {
     cout << "hi this is testing stuff" << endl;
     //GameState game = GameState();
-    GameState game("5k2/pp3pp1/3b2p1/6q1/1B1P4/7r/PPQ3P1/3R1RK1 b - - 1 27");
+    GameState game("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
     game.bb.displayBoard();
 
     MoveGenerator mg;
@@ -32,28 +32,20 @@ void testing() {
     U64 black = game.bb.getBlackPieces();
 
     //mg.generateKingMoves(game.bb, white, empty, true, game.castleBK, game.castleBQ, moves);
-    mg.generateKnightMoves(game.bb, white, true, moves);
-    mg.generatePawnMoves(game.bb, white, empty, game.en_passant, true, moves);
-    mg.generateBishopMoves(game.bb, white, empty, true, moves);
+    mg.generateKnightMoves(game.bb, white, false, moves);
+    mg.generatePawnMoves(game.bb, black, empty, game.en_passant, false, moves);
+    mg.generateBishopMoves(game.bb, black, empty, false, moves);
     printMoves(moves);
+
+    cout << game.exportFEN();
 }
 
 void printMoves(const vector<Move>& moves) {
+    int count = 0;
     for (const Move& m : moves) {
+        count++;
         int from = m.getFromSquare();
         int to = m.getToSquare();
-        cout << squareToAlgebraic(from) << squareToAlgebraic(to)<< endl;
+        cout << count << ". " << m.squareToAlgebraic(from) << m.squareToAlgebraic(to)<< endl;
     }
-}
-
-string squareToAlgebraic(int sq){
-    if (sq < 0 || sq > 63){
-        return "-";
-    }
-    char file = (char) ('a' + (sq % 8));
-    char rank = (char) ('1' + (sq / 8));
-    string s;
-    s += file;
-    s += rank;
-    return s;
 }

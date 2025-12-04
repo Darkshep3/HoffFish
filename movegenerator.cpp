@@ -1,10 +1,12 @@
 #include "movegenerator.h"
 bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
-
+    //in progress
+    return true;
 }
 
-vector<Move> MoveGenerator::generatePseudoMoves(const GameState& state, const Bitboard& board)
+vector<Move> MoveGenerator::generatePseudoMoves(const GameState& state)
 {
+    const Bitboard& board = state.bb;
     //list of moves we return
     vector<Move> moves;
     //find active color
@@ -76,22 +78,59 @@ vector<Move> MoveGenerator::generatePseudoMoves(const GameState& state, const Bi
     return moves;
 }
 
-vector<Move> MoveGenerator::generateLegalMoves(const GameState& state, const Bitboard& board)
+bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb, GameState& state)
 {
+    //determine which side we are checking for (black / white)
+    //our side's king's square
+    int kings_sq;
+    if(check_for_white)
+    {
+        kings_sq = get_LSB(bb.wking);
+    }else
+    {
+        kings_sq = get_LSB(bb.bking);
+    }
+
+    //get a list of the enemy's pseudomoves
+    vector<Move> pseudo = generatePseudoMoves(state);
+
+    //if any of their "to" squares is where our king is at,
+    //is_in_check = true
+    //else
+    //is_in_check = false
+    for(Move m: pseudo)
+    {
+        if(m.to == kings_sq)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
+{
+    // Bitboard& board = state.bb;
     //obtain list of pseudo moves
-    vector<Move> pseudo_moves = generatePseudoMoves(state, board);
+    vector<Move> pseudo_moves = generatePseudoMoves(state);
     //empty list of legal moves
     vector<Move> legal_moves;
     for(const Move m: pseudo_moves)
     {
         //make move and check legality
-        state.makeMove(m.to, m.from, m.promotionPiece);
-        
+        Delta delta = state.deltaMove(m);
+    
         //if legal, store to legal_moves
+        if(!is_in_check)
+        {
+            legal_moves.push_back(m);
+        }
         //unmake move
+        state.unmakeMove(delta);
     }
     
-
+    return legal_moves;
 
 }
 
@@ -99,7 +138,7 @@ vector<Move> MoveGenerator::generateLegalMoves(const GameState& state, const Bit
 void MoveGenerator::generateKingMoves(const Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
-    U64 temp = getKingMoves(fromSq, allies);
+    U64 temp = getKingAttacks(fromSq, allies);
     while (temp != 0){
         moves.push_back(Move(fromSq, get_LSB(temp)));
     }
