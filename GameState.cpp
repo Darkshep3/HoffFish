@@ -329,7 +329,7 @@ void GameState::makeMove(Move move) {
     white_to_move = !white_to_move;
 }
 
-void GameState::unmakeMove(Delta d) {
+void GameState::unmakeMove(const Delta &d) {
 
     // restore global state
     white_to_move = d.white_to_move;

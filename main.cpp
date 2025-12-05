@@ -31,9 +31,9 @@ void testing() {
     U64 black = game.bb.getBlackPieces();
 
     //mg.generateKingMoves(game.bb, white, empty, true, game.castleBK, game.castleBQ, moves);
-    mg.generateKnightMoves(game.bb, white, false, moves);
-    mg.generatePawnMoves(game.bb, black, empty, game.en_passant, false, moves);
-    mg.generateBishopMoves(game.bb, black, empty, false, moves);
+    mg.generateKnightMoves(game.bb, black, false, moves);
+    mg.generatePawnMoves(game.bb, white, empty, game.en_passant, false, moves);
+    mg.generateBishopMoves(game.bb, white, empty, false, moves);
     printMoves(moves);
 
     cout << game.exportFEN();
