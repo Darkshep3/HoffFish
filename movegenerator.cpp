@@ -9,7 +9,13 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool 
     U64 temp = getKingAttacks(fromSq, allies);
     while (temp != 0){
         moves.push_back(Move(fromSq, get_LSB(temp)));
+        temp &= temp -1;
     }
+    //ends prematuraly as king cannot castle in check
+    if (isAttackedSquare(bb, fromSq, !isWhiteToMove)) {
+        return;
+    }
+        
     if (kCastle) {
         int sq = isWhiteToMove? 5: 61;
         int sq2 = isWhiteToMove? 6: 62;
@@ -259,19 +265,3 @@ void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 enemy, U64 empty, bool 
     generateRookMoves(bb, enemy, empty, isWhiteToMove, moves);
 }
 
-
-
-
-
-
-
-
-
-    //Arush 
-    //generate rook moves + queens
-    //queen = rook + bishops 
-    /*MoveGenerator::generateQueensMoves(...){
-        movegenerator:generatebishopMoves()
-        movegenerator:generaterookMoves() 
-    }
-    */ 
