@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array> 
+#include "magic.h"
 
 using U64 = uint64_t;
 using namespace std;
@@ -62,10 +63,27 @@ constexpr array<U64, 64> KNIGHTMOVES = [] {
     return arr;
 }();
 
-U64 getKingAttacks(int square, U64 allies){
+inline U64 getKingAttacks(int square, U64 allies){
     return KINGMOVES[square] & ~ allies;
 }
 
-U64 getKnightAttacks(int square, U64 allies){
+inline U64 getKnightAttacks(int square, U64 allies){
     return KNIGHTMOVES[square] & ~ allies;
 }
+
+inline U64 getRookAttacks(int sq, U64 blockers, U64 allies){
+    blockers &= rmask[sq];
+    int index = transform(blockers, RMagic[sq], RBits[sq]);
+    return RookAttackTable[sq][index] & ~allies;
+}
+
+inline U64 getBishopAttacks(int sq, U64 blockers, U64 allies){
+    blockers &= bmask[sq];
+    int index = transform(blockers, BMagic[sq], BBits[sq]);
+    return BishopAttackTable[sq][index] & ~allies;
+}
+
+inline U64 getQueenAttacks(int sq, U64 blockers, U64 allies){
+    return getRookAttacks(sq, blockers, allies) | getBishopAttacks(sq, blockers, allies);
+}
+

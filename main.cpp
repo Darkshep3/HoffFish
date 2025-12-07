@@ -2,14 +2,18 @@
 #include "GameState.h"
 #include "movegenerator.h"
 #include <cstdlib> 
+#include "magic_generator.cpp"
 
 using namespace std;
 void testing();
+void testing2();
 void printMoves(const vector<Move>& moves);
 
 int main ()
 {
+    init_magic();
     testing();
+    //testing2();
     return 0;
 }
 
@@ -31,12 +35,20 @@ void testing() {
     U64 black = game.bb.getBlackPieces();
 
     //mg.generateKingMoves(game.bb, white, empty, true, game.castleBK, game.castleBQ, moves);
-    mg.generateKnightMoves(game.bb, black, false, moves);
-    mg.generatePawnMoves(game.bb, white, empty, game.en_passant, false, moves);
-    mg.generateBishopMoves(game.bb, white, empty, false, moves);
+    mg.generateKnightMoves(game.bb, white, true, moves);
+    mg.generatePawnMoves(game.bb, black, empty, game.en_passant, true, moves);
+    mg.generateBishopMoves(game.bb, white, black, true, moves);
+    mg.generateRookMoves(game.bb, white, black, true, moves);
+    mg.generateQueenMoves(game.bb, white, black, true, moves);
+
     printMoves(moves);
 
     cout << game.exportFEN();
+}
+
+void testing2(){
+    cout << "Magic Generator!!" << endl;
+    magic_generator();
 }
 
 void printMoves(const vector<Move>& moves) {

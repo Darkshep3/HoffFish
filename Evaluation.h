@@ -128,7 +128,7 @@ class Evaluation{
         -12,  17,  14,  17,  17,  38,  23,  11,
         -74, -35, -18, -18, -11,  15,   4, -17}};
 
-        double evaluate(Bitboard& bb, bool isWhiteToMove){
+    double evaluate(Bitboard& bb, bool isWhiteToMove){
                 int gamePhase = 0;
                 double score = 0;
                 gamePhase += __builtin_popcountll(bb.wknights);
@@ -144,7 +144,7 @@ class Evaluation{
                 score += scorePiece(bb.wpawns, 0, WHITE, gamePhase);
 
             }
-        double scorePiece(U64 bb, int pieceType, int color, int gamePhase){
+    double scorePiece(U64 bb, int pieceType, int color, int gamePhase){
             //please finish the rest of scorepiece
             //the main idea here is that you want to create a formula to calculate midgame and endgame scores together and interpolate them together
             //sample of what i mean
@@ -152,8 +152,8 @@ class Evaluation{
             //double mgWeight = (double) gamePhase / MAX_GAME_PHASE;
             //double egWeight = 1.0 - mgWeight;
             //return (mgScore * mgWeight + egScore * egWeight);
-        }
+    }
         //please code up the double pawns and also isolated pawn bonus essentially check if there are pawns next to it or away
-        int connectedPawnBonus(U64 pawns, int color) {};
-        int pawnStructurePenalty(U64 pawns, int color) {};
+    int connectedPawnBonus(U64 pawns, int color) {};
+    int pawnStructurePenalty(U64 pawns, int color) {};
 };

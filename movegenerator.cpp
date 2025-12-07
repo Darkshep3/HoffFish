@@ -157,11 +157,62 @@ void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int en
         }
     }
 }
+void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+   U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
 
+   //loop thru each knight
+   while(bishops != 0)
+   {
+       int from_sq = get_LSB(bishops);
+       clear_LSB(bishops);
 
+       U64 temp = getBishopAttacks(from_sq, bb.getOccupied(), allies);
+
+       while(temp != 0)
+       {
+            int to_sq = get_LSB(temp);
+            clear_LSB(temp);
+            moves.push_back(Move(from_sq,to_sq));
+       }
+   }
+}
+void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+   U64 rooks = isWhiteToMove ? bb.wrooks : bb.brooks;
+   while(rooks != 0)
+   {
+       int from_sq = get_LSB(rooks);
+       clear_LSB(rooks);
+
+       U64 temp = getRookAttacks(from_sq, bb.getOccupied(), allies);
+
+       while(temp != 0)
+       {
+            int to_sq = get_LSB(temp);
+            clear_LSB(temp);
+            moves.push_back(Move(from_sq,to_sq));
+       }
+   }
+}
+void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+   U64 queens = isWhiteToMove ? bb.wqueens : bb.bqueens;
+   while(queens != 0)
+   {
+       int from_sq = get_LSB(queens);
+       clear_LSB(queens);
+
+       U64 temp = getQueenAttacks(from_sq, bb.getOccupied(), allies);
+
+       while(temp != 0)
+       {
+            int to_sq = get_LSB(temp);
+            clear_LSB(temp);
+            moves.push_back(Move(from_sq,to_sq));
+       }
+   }
+}
+/*
 //Arush 
-//Bishop Move Generatoin 
-// Rooks + queens if you have time  
+//Bishop Move Generation
 void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves){
     //create vector of squares that contain the current player's bishops
     U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
@@ -265,3 +316,4 @@ void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 enemy, U64 empty, bool 
     generateRookMoves(bb, enemy, empty, isWhiteToMove, moves);
 }
 
+*/

@@ -13,11 +13,13 @@ public:
     static void generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
     static void generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
     static void generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves);
-    static void generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
-    static void generateRookMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
-    static void generateQueenMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
-    //static void generateSlidingMoves(Bitboard& bb, bool white, vector<Move>& moves);
+    static void generateBishopMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves);
+    static void generateRookMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves);
+    static void generateQueenMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves);
+
     static bool isAttackedSquare(Bitboard& bb, int square, bool isWhite);
+    static bool isInCheck(Bitboard& bb, bool isWhiteMove);
+    
 
 
 };
