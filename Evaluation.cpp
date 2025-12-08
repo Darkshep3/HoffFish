@@ -1,3 +1,9 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+#include "GameState.h"
+#include "Bitboard.h"
+#include "Evaluation.h"
 double evaluate(Bitboard& bb, bool isWhiteToMove) {
     int gamePhase = 0;
     double score = 0;
