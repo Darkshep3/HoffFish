@@ -2,10 +2,11 @@
 #include "GameState.h"
 #include "movegenerator.h"
 #include <cstdlib> 
-#include "magic_generator.cpp"
+#include "magic_generator.h"
 
 using namespace std;
 void testing();
+void play();
 void testing2();
 void printMoves(const vector<Move>& moves);
 
@@ -13,15 +14,36 @@ int main ()
 {
     init_magic();
     testing();
+    //play();
     //testing2();
     return 0;
 }
 
 //starts a chess game
-void play(){
+/*void play(){
+    GameState game;
+    bool game_on = true;
+    while (game_on) {
+        game.bb.displayBoard();
+        string player_color = game.white_to_move ? "white" : "black";
+        cout << player_color << "enter move: (ex. e2e4)";
+        bool valid_move = false;
 
+        string player_move;
+        cin >> player_move;
+        int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
+        int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
+        bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
+        bool moving_to_nonally_square = (!game.bb.getWhitePieces() & (1ULL << to));
+
+        
+
+        Move move(from, to);
+        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        game.makeMove(move); 
+    }
 }
-
+*/
 void testing() {
     cout << "hi this is testing stuff" << endl;
     //GameState game = GameState();

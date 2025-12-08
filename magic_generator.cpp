@@ -1,7 +1,8 @@
-#include <cstdint> 
-#include <cstdlib> 
-#include <iostream>
-#include "magic.h"
+// #include <cstdint> 
+// #include <cstdlib> 
+// #include <iostream>
+// #include "magic.h"
+#include "magic_generator.h"
 
 //Credit to Niklas Fiekas for this Magic Bitboard generation! 
 

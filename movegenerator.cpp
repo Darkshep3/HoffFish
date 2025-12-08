@@ -210,6 +210,12 @@ void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, U64 enemy, bool
        }
    }
 }
+
+
+vector<Move> MoveGenerator::generateLegalMoves(GameState& state) {
+    vector<Move> moves;
+    return moves;
+}
 /*
 //Arush 
 //Bishop Move Generation
