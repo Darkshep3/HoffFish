@@ -16,9 +16,9 @@ public:
     static void generateBishopMoves(const Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
     static void generateRookMoves(const Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
     static void generateQueenMoves(const Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves);
-    //static void generateSlidingMoves(Bitboard& bb, bool white, vector<Move>& moves);
+
     static bool isAttackedSquare(const Bitboard& bb, int square, bool isWhite);
-    bool is_in_check(bool white_to_move, Bitboard bb, GameState& state); //bb of all pieces white and black
+    bool is_in_check(bool white_to_move, Bitboard bb); 
 
 
 };

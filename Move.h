@@ -20,6 +20,7 @@ public:
     char promotion;
     MoveType moveType;
 
+
     //the constructor
     Move(int from, int to)
     {
@@ -75,6 +76,12 @@ public:
         s += file;
         s += rank;
         return s;
+    }
+    bool isPromotion() {
+        return moveType == MoveType::PROMOTION_QUEEN ||
+            moveType == MoveType::PROMOTION_ROOK ||
+            moveType == MoveType::PROMOTION_BISHOP ||
+            moveType == MoveType::PROMOTION_KNIGHT;
     }
 
 

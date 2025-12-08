@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array> 
+#include "magic.h"
 
 using U64 = uint64_t;
 using namespace std;
@@ -46,7 +47,7 @@ constexpr U64 computeKnightMoves(int square){
     
 }
 
-inline constexpr array<U64, 64> KINGMOVES = [] {
+constexpr array<U64, 64> KINGMOVES = [] {
     array<U64, 64> arr{};
     for (int sq = 0; sq < 64; sq++){
         arr[sq] = computeKingMoves(sq);
@@ -54,7 +55,7 @@ inline constexpr array<U64, 64> KINGMOVES = [] {
     return arr;
 }();
 
-inline constexpr array<U64, 64> KNIGHTMOVES = [] {
+constexpr array<U64, 64> KNIGHTMOVES = [] {
     array<U64, 64> arr{};
     for (int sq = 0; sq < 64; sq++){
         arr[sq] = computeKnightMoves(sq);
@@ -62,10 +63,27 @@ inline constexpr array<U64, 64> KNIGHTMOVES = [] {
     return arr;
 }();
 
-inline U64 getKingMoves(int square, U64 allies){
+inline U64 getKingAttacks(int square, U64 allies){
     return KINGMOVES[square] & ~ allies;
 }
 
-inline U64 getKnightMoves(int square, U64 allies){
+inline U64 getKnightAttacks(int square, U64 allies){
     return KNIGHTMOVES[square] & ~ allies;
 }
+
+inline U64 getRookAttacks(int sq, U64 blockers, U64 allies){
+    blockers &= rmask[sq];
+    int index = transform(blockers, RMagic[sq], RBits[sq]);
+    return RookAttackTable[sq][index] & ~allies;
+}
+
+inline U64 getBishopAttacks(int sq, U64 blockers, U64 allies){
+    blockers &= bmask[sq];
+    int index = transform(blockers, BMagic[sq], BBits[sq]);
+    return BishopAttackTable[sq][index] & ~allies;
+}
+
+inline U64 getQueenAttacks(int sq, U64 blockers, U64 allies){
+    return getRookAttacks(sq, blockers, allies) | getBishopAttacks(sq, blockers, allies);
+}
+
