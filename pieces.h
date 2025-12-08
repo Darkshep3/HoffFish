@@ -86,4 +86,3 @@ inline U64 getBishopAttacks(int sq, U64 blockers, U64 allies){
 inline U64 getQueenAttacks(int sq, U64 blockers, U64 allies){
     return getRookAttacks(sq, blockers, allies) | getBishopAttacks(sq, blockers, allies);
 }
-

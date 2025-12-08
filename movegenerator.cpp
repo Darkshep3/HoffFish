@@ -1,88 +1,5 @@
 #include "movegenerator.h"
-bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool isWhite){
-    //in progress
-    return true;
-}
-
-vector<Move> MoveGenerator::generatePseudoMoves(const GameState& state)
-{
-    const Bitboard& bb = state.bb;
-    //list of moves we return
-    vector<Move> moves;
-    //find active color
-    if(state.white_to_move)
-    {
-        //enemy bb
-        U64 enemy = bb.bpawns | bb.bknights | bb.bbishops | bb.brooks | bb.bqueens | bb.bking;
-        //ally bb
-        U64 ally = bb.wpawns | bb.wknights | bb.wbishops | bb.wrooks | bb.wqueens | bb.wking;
-        //empty bb
-        U64 empty = ~(ally | enemy);  
-        //loop through all that side’s pieces
-
-        //pawns
-        generatePawnMoves(bb, enemy, empty, state.en_passant, true, moves);
-        //true bc white is already checked to be active here
-
-        //knights
-        generateKnightMoves(bb, ally, true, moves);
-
-        //bishops
-        generateBishopMoves(bb, enemy, empty, true, moves);
-
-        //rooks
-        //to be coded
-        generateRookMoves(bb, enemy, empty, true, moves);
-
-        //queens
-        //to be coded
-        generateQueenMoves(bb, enemy, empty, true, moves);
-
-        //king
-        generateKingMoves(bb, ally, empty, true, state.castleWK, state.castleWQ, moves);
-        
-        
-    }else
-    {
-        //ally bb
-        U64 ally = bb.bpawns | bb.bknights | bb.bbishops | bb.brooks | bb.bqueens | bb.bking;
-        //enemy bb
-        U64 enemy = bb.wpawns | bb.wknights | bb.wbishops | bb.wrooks | bb.wqueens | bb.wking;
-        //empty bb
-        U64 empty = ~(ally | enemy);  
-        //loop through all that side’s pieces
-
-        //pawns
-        generatePawnMoves(bb, enemy, empty, state.en_passant, false, moves);
-        //true bc white is already checked to be active here
-
-        //knights
-        generateKnightMoves(bb, ally, false, moves);
-
-        //bishops
-        generateBishopMoves(bb, enemy, empty, false, moves);
-
-        //rooks
-        //to be coded
-        generateRookMoves(bb, enemy, empty, false, moves);
-
-        //queens
-        //to be coded
-        generateQueenMoves(bb, enemy, empty, false, moves);
-
-        //king
-        generateKingMoves(bb, ally, empty, false, state.castleBK, state.castleBQ, moves);
-    }
-    
-    //return vector
-    return moves;
-}
-
-bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
-{
-    //determine which side we are checking for (black / white)
-    int kings_sq = check_for_white ? bb.wking : bb.bking;
-
+ bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool check_for_white){
     //allies bit board
     U64 allies = check_for_white ? bb.wpawns | bb.wknights | bb.wbishops | bb.wrooks | bb.wqueens | bb.wking : bb.bpawns | bb.bknights | bb.bbishops | bb.brooks | bb.bqueens | bb.bking;
     
@@ -144,10 +61,100 @@ bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
     U64 pawns_attacks = pawns_attacks_left | pawns_attacks_right;
 
     //combine all those bitboard and make a enemy's_attack bitboard
+    U64 enemy_attacks = king_attacks | knights_attacks | rooks_attacks | bishops_attacks | queens_attacks | pawns_attacks;
 
     //if king is on any of those squares in the bb -> true
-
+    while(enemy_attacks !=0)
+    {
+        if(square == get_LSB(enemy_attacks))
+        {
+            return true;
+        }
+        clear_LSB(enemy_attacks);
+    }
     //if not -> false
+    return false;
+ }
+
+vector<Move> MoveGenerator::generatePseudoMoves(GameState& state)
+{
+    Bitboard& bb = state.bb;
+    //list of moves we return
+    vector<Move> moves;
+    //find active color
+    if(state.white_to_move)
+    {
+        //enemy bb
+        U64 enemy = bb.bpawns | bb.bknights | bb.bbishops | bb.brooks | bb.bqueens | bb.bking;
+        //ally bb
+        U64 ally = bb.wpawns | bb.wknights | bb.wbishops | bb.wrooks | bb.wqueens | bb.wking;
+        //empty bb
+        U64 empty = ~(ally | enemy);  
+        //loop through all that side’s pieces
+
+        //pawns
+        generatePawnMoves(bb, enemy, empty, state.en_passant, true, moves);
+        //true bc white is already checked to be active here
+
+        //knights
+        generateKnightMoves(bb, ally, true, moves);
+
+        //bishops
+        generateBishopMoves(bb, ally, true, moves);
+
+        //rooks
+        generateRookMoves(bb, ally, enemy, true, moves);
+
+        //queens
+        //to be coded
+        generateQueenMoves(bb, ally, enemy, true, moves);
+
+        //king
+        generateKingMoves(bb, ally, empty, true, state.castleWK, state.castleWQ, moves);
+        
+        
+    }else
+    {
+        //ally bb
+        U64 ally = bb.bpawns | bb.bknights | bb.bbishops | bb.brooks | bb.bqueens | bb.bking;
+        //enemy bb
+        U64 enemy = bb.wpawns | bb.wknights | bb.wbishops | bb.wrooks | bb.wqueens | bb.wking;
+        //empty bb
+        U64 empty = ~(ally | enemy);  
+        //loop through all that side’s pieces
+
+        //pawns
+        generatePawnMoves(bb, enemy, empty, state.en_passant, false, moves);
+        //true bc white is already checked to be active here
+
+        //knights
+        generateKnightMoves(bb, ally, false, moves);
+
+        //bishops
+        generateBishopMoves(bb, ally, false, moves);
+
+        //rooks
+        //to be coded
+        generateRookMoves(bb, ally, enemy, false, moves);
+
+        //queens
+        //to be coded
+        generateQueenMoves(bb, ally, enemy, false, moves);
+
+        //king
+        generateKingMoves(bb, ally, empty, false, state.castleBK, state.castleBQ, moves);
+    }
+    
+    //return vector
+    return moves;
+}
+
+bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
+{
+    //determine which side we are checking for (black / white)
+    int king = check_for_white ? bb.wking : bb.bking;
+
+    return isAttackedSquare(bb, king, check_for_white);
 }
 
 vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
@@ -176,7 +183,7 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
 }
 
 
-void MoveGenerator::generateKingMoves(const Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
+void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves){
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
     U64 temp = getKingAttacks(fromSq, allies);
@@ -215,7 +222,7 @@ void MoveGenerator::generateKingMoves(const Bitboard& bb, U64 allies, U64 empty,
 }
 
 //Diana 
-void MoveGenerator::generateKnightMoves(const Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
    U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
 
@@ -243,7 +250,7 @@ void MoveGenerator::generateKnightMoves(const Bitboard& bb, U64 allies, bool isW
 
 //Ethan  
 
-void MoveGenerator::generatePawnMoves(const Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
 {
     U64 pawns = isWhiteToMove ? bb.wpawns : bb.bpawns;
     int direction = isWhiteToMove ? 8 : -8;
@@ -330,7 +337,8 @@ void MoveGenerator::generatePawnMoves(const Bitboard& bb, U64 enemy, U64 empty, 
         }
     }
 }
-void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+
+void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
    U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
 
    //loop thru each knight
