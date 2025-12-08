@@ -5,17 +5,17 @@
 // Connected Pawns for bonus 
 
 class Evaluation{
-    const int WHITE = 0;
-    const int BLACK = 1;
-    const int MAX_GAME_PHASE = 24;
-    const int PIECE_VALUES [2][6] = {
+    const static int WHITE = 0;
+    const static int BLACK = 1;
+    const static int MAX_GAME_PHASE = 24;
+    const static int PIECE_VALUES [2][6] = {
     //P N B R Q K
     {82, 337, 365, 477, 1025, 12000}, //middlegame 
     {94, 281, 297, 512, 936, 12000}}; //endgame
-    const int CONNECTED_PAWN_BONUS = 6;
-    const int DOUBLE_PAWN_PENALTY = 13;
-    const int ISOLATED_PAWN_PENALTY = 12;
-    const int midgamePST [6][64] = 
+    const static int CONNECTED_PAWN_BONUS = 6;
+    const static int DOUBLE_PAWN_PENALTY = 13;
+    const static int ISOLATED_PAWN_PENALTY = 12;
+    const static int midgamePST [6][64] = 
     {
         //pawn
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -71,7 +71,7 @@ class Evaluation{
         -9, 24, 2, -16, -20, 6, 22, -22,
         29, -1, -20, -7, -8, -4, -38, -29,
         -65, 23, 16, -15, -56, -34, 2, 13}};
-    const int endgamePST [6][64] = 
+    const static int endgamePST [6][64] = 
         {
         //pawns 
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -128,8 +128,9 @@ class Evaluation{
         -12,  17,  14,  17,  17,  38,  23,  11,
         -74, -35, -18, -18, -11,  15,   4, -17}};
 
-    double evaluate(Bitboard& bb, bool isWhiteToMove);
-    double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
-    int connectedPawnBonus(U64 pawns, int color);
-    int pawnStructurePenalty(U64 pawns, int color);
+    public:
+        static double evaluate(Bitboard& bb, bool isWhiteToMove);
+        static double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
+        static int connectedPawnBonus(U64 pawns, int color);
+        static int pawnStructurePenalty(U64 pawns, int color);
 };
