@@ -132,4 +132,4 @@ class Evaluation{
     double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
     int connectedPawnBonus(U64 pawns, int color);
     int pawnStructurePenalty(U64 pawns, int color);
-}
+};
