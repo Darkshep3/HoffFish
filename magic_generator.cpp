@@ -5,9 +5,6 @@
 #include "magic_generator.h"
 
 //Credit to Niklas Fiekas for this Magic Bitboard generation! 
-
-typedef uint64_t U64;
-
 //ill research this later because apparently using rand() 32 random bits could be low quality and have higher chance of collisions
 //but i think this approach should not have errors? 
 //technically after we generate this, we can store it as a txt then not need to run this again to save time! 

@@ -13,20 +13,20 @@ void printMoves(const vector<Move>& moves);
 int main ()
 {
     init_magic();
-    // testing();
-    play();
-    //testing2();
+    testing();
+    //play();
+    testing2();
     return 0;
 }
 
 //starts a chess game
-void play(){
+/*void play(){
     GameState game;
     bool game_on = true;
     while (game_on) {
         game.bb.displayBoard();
         string player_color = game.white_to_move ? "white" : "black";
-        cout << player_color << "enter move: ";
+        cout << player_color << "enter move: (ex. e2e4)";
         bool valid_move = false;
 
         string player_move;
@@ -43,7 +43,7 @@ void play(){
         game.makeMove(move); 
     }
 }
-
+*/
 void testing() {
     cout << "hi this is testing stuff" << endl;
     //GameState game = GameState();
@@ -65,7 +65,7 @@ void testing() {
 
     printMoves(moves);
 
-    cout << game.exportFEN();
+    cout << game.exportFEN() << endl;
 }
 
 void testing2(){
