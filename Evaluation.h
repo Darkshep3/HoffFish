@@ -144,19 +144,19 @@ class Evaluation{
         gamePhase += __builtin_popcountll(bb.bqueens) * 4;
     
         // material scoring
-        score += scorePiece(bb.wpawns,   PAWN,   WHITE, gamePhase);
-        score += scorePiece(bb.wknights, KNIGHT, WHITE, gamePhase);
-        score += scorePiece(bb.wbishops, BISHOP, WHITE, gamePhase);
-        score += scorePiece(bb.wrooks,   ROOK,   WHITE, gamePhase);
-        score += scorePiece(bb.wqueens,  QUEEN,  WHITE, gamePhase);
-        score += scorePiece(bb.wking,    KING,   WHITE, gamePhase);
+        score += scorePiece(bb.wpawns,   0,   WHITE, gamePhase);
+        score += scorePiece(bb.wknights, 1, WHITE, gamePhase);
+        score += scorePiece(bb.wbishops, 2, WHITE, gamePhase);
+        score += scorePiece(bb.wrooks,   3,   WHITE, gamePhase);
+        score += scorePiece(bb.wqueens,  4,  WHITE, gamePhase);
+        score += scorePiece(bb.wking,    5,   WHITE, gamePhase);
     
-        score -= scorePiece(bb.bpawns,   PAWN,   BLACK, gamePhase);
-        score -= scorePiece(bb.bknights, KNIGHT, BLACK, gamePhase);
-        score -= scorePiece(bb.bbishops, BISHOP, BLACK, gamePhase);
-        score -= scorePiece(bb.brooks,   ROOK,   BLACK, gamePhase);
-        score -= scorePiece(bb.bqueens,  QUEEN,  BLACK, gamePhase);
-        score -= scorePiece(bb.bking,    KING,   BLACK, gamePhase);
+        score -= scorePiece(bb.bpawns,   0,   BLACK, gamePhase);
+        score -= scorePiece(bb.bknights, 1, BLACK, gamePhase);
+        score -= scorePiece(bb.bbishops, 2, BLACK, gamePhase);
+        score -= scorePiece(bb.brooks,   3,   BLACK, gamePhase);
+        score -= scorePiece(bb.bqueens,  4,  BLACK, gamePhase);
+        score -= scorePiece(bb.bking,    5,   BLACK, gamePhase);
     
     
         return score;
