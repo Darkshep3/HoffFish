@@ -15,7 +15,7 @@ int main ()
     init_magic();
     testing();
     //play();
-    //testing2();
+    testing2();
     return 0;
 }
 
@@ -65,7 +65,7 @@ void testing() {
 
     printMoves(moves);
 
-    cout << game.exportFEN();
+    cout << game.exportFEN() << endl;
 }
 
 void testing2(){
