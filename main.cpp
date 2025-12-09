@@ -59,9 +59,9 @@ void testing() {
     //mg.generateKingMoves(game.bb, white, empty, true, game.castleBK, game.castleBQ, moves);
     mg.generateKnightMoves(game.bb, white, true, moves);
     mg.generatePawnMoves(game.bb, black, empty, game.en_passant, true, moves);
-    mg.generateBishopMoves(game.bb, white, black, true, moves);
-    mg.generateRookMoves(game.bb, white, black, true, moves);
-    mg.generateQueenMoves(game.bb, white, black, true, moves);
+    mg.generateBishopMoves(game.bb, white, true, moves);
+    mg.generateRookMoves(game.bb, white, true, moves);
+    mg.generateQueenMoves(game.bb, white, true, moves);
 
     printMoves(moves);
 

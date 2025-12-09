@@ -157,7 +157,7 @@ void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int en
         }
     }
 }
-void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
    U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
 
    //loop thru each knight
@@ -176,7 +176,7 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, U64 enemy, boo
        }
    }
 }
-void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
    U64 rooks = isWhiteToMove ? bb.wrooks : bb.brooks;
    while(rooks != 0)
    {
@@ -193,7 +193,7 @@ void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, U64 enemy, bool 
        }
    }
 }
-void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, U64 enemy, bool isWhiteToMove, vector<Move>& moves){
+void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
    U64 queens = isWhiteToMove ? bb.wqueens : bb.bqueens;
    while(queens != 0)
    {
