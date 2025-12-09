@@ -1,9 +1,12 @@
-#pragma once
 #include <iostream>
-#include "Bitboard.h"
 #include <string>
+#include <sstream>
+#include "GameState.h"
+#include "Bitboard.h"
+
 using namespace std;
 
+//write all the functions needed in GameState using gamestate.h's skeleton! 
 
 //Constructor, a bit of object oriented stuff now
 GameState::GameState()
@@ -74,91 +77,94 @@ GameState::GameState(const string& fen)
         int file = 0;
         for(char current_char: piece_placement[rank])
         {
-            white_to_move = true;
-            castleWK = true;
-            castleWQ = true;
-            castleBK = true;
-            castleBQ = true;
-            int en_passant = -1;
-            full_moves = 0;
-            half_moves = 0;
-            board = new Bitboard();
-        }; //Diana
-        explicit GameState(const string fen)
-        {
-            string fen_copy = fen;
-            int length = fen.length();
-            string fen_info[6];
-            //the 6 pieces of info are:
-            // string piece_placement;
-            // string active_color;
-            // string castling_rights;
-            // string en_passant;
-            // string half_moves;
-            // string full_moves;
-            int space_index = fen_copy.find(" "); 
-            for(int i = 0; space_index != string::npos; i++)
+            //for every character in piece_placement in specified rank,
+            if(isdigit(current_char))
             {
-                
-                //while we can find a space
-                fen_info[i]= fen_copy.substr(0, space_index + 1);
-                //cut down the part we stored
-                fen_copy = fen_copy.substr(space_index + 1, length - (space_index + 1));
-                //get a new index for the next space
-                space_index = fen_copy.find(" ");
-            }
-            
-            //translate from fen to game state
-
-            //pieces on the board (0)
-            //loop thru each position and if it's not empty then set the bit
-            //nested loop
-            for(int rank = 0; rank < 8; rank++)
-            {
-                //increments the index for piece_placenment
-                int file = 0;
-                for(char current_char: piece_placement[rank])
-                {
-                    //for every character in piece_placement in specified rank,
-                    if(isdigit(current_char))
-                    {
-                        //if current char is an int between 0 - 9
-                        file += current_char - '0';
-                        //increase the file by the # of emoty spaces on the board
-                    }else
-                    {
-                        //there is actual piece on that square
-                        int square = (7-rank) * 8 + file;
-                        //7-rank bc fen begins on 8th rank and goes to 1st
-                        set_bit(current_char, square);
-                        //put that piece on the board
-                        file++;
-                    }
-                    
-                }
-            }
-
-
-
-            //active color (1)
-            if(fen_info[1] == "w")
-            {
-                white_to_move = true;
+                //if current char is an int between 0 - 9
+                file += current_char - '0';
+                //increase the file by the # of emoty spaces on the bb
             }else
             {
-                white_to_move = false;
-            }
+                //there is actual piece on that square
+                int square = (7-rank) * 8 + file;
+                //7-rank bc fen begins on 8th rank and goes to 1st
 
-            //castling rights (2)
-            //set all to false
-            //if it contains "-", leave it bc all is false
-            //else, read in the chars and set corresponding bools to true
+                //set_bit(current_char, square);
+                bb.placePiece(current_char, square);
+
+                //put that piece on the bb
+                file++;
+            }
+            
+        }
+    }
+
+
+
+    //active color (1)
+    if(fen_info[1] == "w")
+    {
+        white_to_move = true;
+    }else
+    {
+        white_to_move = false;
+    }
+
+    //castling rights (2)
+    //set all to false
+    //if it contains "-", leave it bc all is false
+    //else, read in the chars and set corresponding bools to true
+
+    castleWK = false;
+    castleWQ = false;
+    castleBK = false;
+    castleBQ = false;
+
+    if(fen_info[2] != "-")
+    {
+        for(int i = 0; i < fen_info[2].length();i++ )
+        {
+            if(fen_info[2].at(i) == 'K')
+            {
+                castleWK = true;
+            }else if (fen_info[2].at(i) == 'Q')
+            {
+                castleWQ = true;
+            }else if (fen_info[2].at(i) == 'k')
+            {
+                castleBK = true;
+            }else if(fen_info[2].at(i) == 'q')
+            {
+                castleBQ = true;
+            }
+        }
+    }
+
+    //en passant (3)
+    //if no en passant, set int to -1
+    if(fen_info[3] == "-")
+    {
+        en_passant = -1;
+    }else
+    {
+        int file = fen_info[3].at(0) - 'a';
+        int rank = fen_info[3].at(1) - 1;
+        en_passant = rank*8 + file;
+    }
+
+    //half move (4)
+    half_moves = stoi(fen_info[4]);
+
+    //full move (5)
+    full_moves = stoi(fen_info[5]);
+
+};
 
 string GameState::exportFEN(){
 
     ostringstream strm;
 
-    //write bitboard data to FEN format
+    //write bitbb data to FEN format
     int emptySpaces = 0;
     for (int rank=7; rank>=0; rank--){
         for (int file=0; file<8; file++){
@@ -232,32 +238,6 @@ string GameState::exportFEN(){
     return strm.str();
 
 }
-struct Move {
-    int from;
-    int to;
-    char movedPiece;
-    char capturedPiece;
-    char promotionPiece; // new, for pawn promotion
-    bool castleWK, castleWQ, castleBK, castleBQ;
-    int en_passant;
-    int half_moves;
-    bool isEnPassant;
-    bool isCastling;
-};
-void GameState::makeMove(int from, int to, char promotion = 0) 
-{
-    Move m;
-    m.from = from;
-    m.to = to;
-    m.castleWK = castleWK;
-    m.castleWQ = castleWQ;
-    m.castleBK = castleBK;
-    m.castleBQ = castleBQ;
-    m.en_passant = en_passant;
-    m.half_moves = half_moves;
-    m.promotionPiece = promotion;
-    m.isEnPassant = false;
-    m.isCastling = false;
 
 void GameState::makeMove(Move move) {
 
@@ -419,6 +399,7 @@ void GameState::unmakeMove(const Delta &d) {
             }
         }
     }
+}
 
 
 //Makes a move but stores previous positional state
@@ -443,6 +424,4 @@ Delta GameState::deltaMove (Move move){
     makeMove(move);
     return delta;
 };
-
-
     
