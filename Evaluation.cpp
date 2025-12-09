@@ -1,6 +1,6 @@
 #include "Bitboard.h"
 #include "Evaluation.h"
-double evaluate(Bitboard& bb, bool isWhiteToMove) {
+double Evaluation::evaluate(Bitboard& bb, bool isWhiteToMove) {
     int gamePhase = 0;
     double score = 0;
 
@@ -34,7 +34,7 @@ double evaluate(Bitboard& bb, bool isWhiteToMove) {
     return score;
 }
 
-double scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
+double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
     double mgScore = 0, egScore = 0;
 
     // interpolation weights
