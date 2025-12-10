@@ -4,6 +4,7 @@
 #include <cstdlib> 
 #include "magic_generator.h"
 #include <optional>
+#include "Evaluation.h"
 
 using namespace std;
 void testing();
@@ -69,9 +70,13 @@ optional<Move> parseMove(string input, GameState game) {
 //starts a chess game
 void play(){
     GameState game;
+    Evaluation e;
     bool game_on = true;
     while (game_on) {
+        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        printMoves(legal_moves);
         game.bb.displayBoard();
+        cout << "Score: " << e.evaluate(game.bb) << endl;
         string player_color = game.white_to_move ? "White: " : "Black: ";
         cout << player_color << "Enter your move (ex. e2e4), or 'quit' to exit: " << endl;
 
@@ -94,9 +99,9 @@ void play(){
 
         
 
-        // Move move(from, to);
-        // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-        // game.makeMove(move); 
+        Move move(from, to);
+        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        game.makeMove(move); 
     }
 }
 
