@@ -1,6 +1,6 @@
 #include "Bitboard.h"
 #include "Evaluation.h"
-double Evaluation::evaluate(Bitboard& bb, bool isWhiteToMove) {
+double Evaluation::evaluate(Bitboard& bb) {
     int gamePhase = 0;
     double score = 0;
 
@@ -30,8 +30,12 @@ double Evaluation::evaluate(Bitboard& bb, bool isWhiteToMove) {
     score -= scorePiece(bb.bqueens,  4,  BLACK, gamePhase);
     score -= scorePiece(bb.bking,    5,   BLACK, gamePhase);
 
+    score += connectedPawnBonus(bb.wpawns, WHITE);
+    score -= connectedPawnBonus(bb.bpawns, BLACK);
+    score -= pawnStructurePenalty(bb.wpawns, WHITE);
+    score += pawnStructurePenalty(bb.bpawns, BLACK);
 
-    return score;
+    return score/100;
 }
 
 double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
@@ -46,7 +50,7 @@ double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
         int sq = __builtin_ctzll(bb);
         bb &= bb - 1;
 
-        int idx = (color == WHITE ? sq : 63 - sq);
+        int idx = (color == WHITE ? sq : sq ^ 56); //using sq ^ 56 to make it faster as it uses a single bitwise operation over 63 -sq fetching 63 constant subtracting sq and storing result
 
         mgScore += PIECE_VALUES[0][pieceType] + midgamePST[pieceType][idx];
         egScore += PIECE_VALUES[1][pieceType] + endgamePST[pieceType][idx];
@@ -54,7 +58,7 @@ double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
 
     return mgScore * mgWeight + egScore * egWeight;
 }
-int connectedPawnBonus(U64 pawns, int color) {
+int Evaluation::connectedPawnBonus(U64 pawns, int color) {
     int bonus = 0;
 
     while (pawns) {
@@ -71,13 +75,13 @@ int connectedPawnBonus(U64 pawns, int color) {
         U64 rightMask = rightFile ? (0x0101010101010101ULL << (file + 1)) : 0;
 
         if (((pawns & leftMask) != 0) || ((pawns & rightMask) != 0)) {
-            bonus += CONNECTED_PAWN_BONUS;
+            bonus += CONNECTED_PAWN_SCORE;
         }
     }
 
     return bonus;
 }
-int pawnStructurePenalty(U64 pawns, int color) {
+int Evaluation::pawnStructurePenalty(U64 pawns, int color) {
     int penalty = 0;
 
     U64 original = pawns;
@@ -97,7 +101,7 @@ int pawnStructurePenalty(U64 pawns, int color) {
     // doubled pawn penalty
     for (int f = 0; f < 8; f++) {
         if (fileCount[f] > 1) {
-            penalty += DOUBLE_PAWN_PENALTY * (fileCount[f] - 1);
+            penalty += DOUBLE_PAWN_SCORE * (fileCount[f] - 1);
         }
     }
 
@@ -112,7 +116,7 @@ int pawnStructurePenalty(U64 pawns, int color) {
         bool hasRight = (file < 7 && fileCount[file + 1] > 0);
 
         if (!hasLeft && !hasRight) {
-            penalty += ISOLATED_PAWN_PENALTY;
+            penalty += ISOLATED_PAWN_SCORE;
         }
     }
 

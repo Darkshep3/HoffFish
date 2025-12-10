@@ -137,11 +137,11 @@ vector<Move> MoveGenerator::generatePseudoMoves(GameState& state)
 
         //rooks
         //to be coded
-        generateRookMoves(bb, ally, true, moves);
+        generateRookMoves(bb, ally, false, moves);
 
         //queens
         //to be coded
-        generateQueenMoves(bb, ally, true, moves);
+        generateQueenMoves(bb, ally, false, moves);
 
         //king
         generateKingMoves(bb, ally, empty, false, state.castleBK, state.castleBQ, moves);
@@ -154,7 +154,7 @@ vector<Move> MoveGenerator::generatePseudoMoves(GameState& state)
 bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
 {
     //determine which side we are checking for (black / white)
-    U64 king = check_for_white ? bb.wking : bb.bking;  // initially u wrote int king = check... but that would not work since you would lose the upper 32 bits 
+    U64 king = check_for_white ? bb.wking : bb.bking;  
     int sq = get_LSB(king); 
 
     return isAttackedSquare(bb, sq, check_for_white);
@@ -170,11 +170,11 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
     for(const Move m: pseudo_moves)
     {
         //make move and check legality
-        Delta delta = state.deltaMove(m);
-    
+        Delta delta = state.deltaMove(m);    
         //if legal, store to legal_moves
-        if(!is_in_check(delta.white_to_move, state.bb))
+        if(!is_in_check(!state.white_to_move, state.bb))
         {
+            cout << state.white_to_move << endl;
             legal_moves.push_back(m);
         }
         //unmake move

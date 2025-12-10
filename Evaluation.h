@@ -5,18 +5,17 @@
 // Connected Pawns for bonus 
 
 class Evaluation{
-    //cannot do const static int [2][6] then its initlizing as static means you will define it later 
-    const int WHITE = 0;
-    const int BLACK = 1;
-    const int MAX_GAME_PHASE = 24;
-    const int PIECE_VALUES [2][6] = {
+    static const int WHITE = 0;
+    static const int BLACK = 1;
+    static const int MAX_GAME_PHASE = 24;
+    static constexpr int PIECE_VALUES [2][6] = { //You need constexpr for arrays
     //P N B R Q K
     {82, 337, 365, 477, 1025, 12000}, //middlegame 
     {94, 281, 297, 512, 936, 12000}}; //endgame
-    const int CONNECTED_PAWN_BONUS = 6;
-    const int DOUBLE_PAWN_PENALTY = 13;
-    const  int ISOLATED_PAWN_PENALTY = 12;
-    const int midgamePST [6][64] = 
+    static const int CONNECTED_PAWN_SCORE = 6;
+    static const int DOUBLE_PAWN_SCORE = 13;
+    static const  int ISOLATED_PAWN_SCORE = 12;
+    static constexpr int midgamePST [6][64] = 
     {
         //pawn
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -72,7 +71,7 @@ class Evaluation{
         -9, 24, 2, -16, -20, 6, 22, -22,
         29, -1, -20, -7, -8, -4, -38, -29,
         -65, 23, 16, -15, -56, -34, 2, 13}};
-    const int endgamePST [6][64] = 
+    static constexpr int endgamePST [6][64] = 
         {
         //pawns 
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -130,7 +129,7 @@ class Evaluation{
         -74, -35, -18, -18, -11,  15,   4, -17}};
 
     public:
-        static double evaluate(Bitboard& bb, bool isWhiteToMove);
+        static double evaluate(Bitboard& bb);
         static double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
         static int connectedPawnBonus(U64 pawns, int color);
         static int pawnStructurePenalty(U64 pawns, int color);
