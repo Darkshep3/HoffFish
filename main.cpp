@@ -3,6 +3,7 @@
 #include "movegenerator.h"
 #include <cstdlib> 
 #include "magic_generator.h"
+#include <optional>
 
 using namespace std;
 void testing();
@@ -19,6 +20,52 @@ int main ()
     return 0;
 }
 
+optional<Move> parseMove(string input, GameState game) {
+    bool valid0; 
+    bool valid1;
+    bool valid2;
+    bool valid3;
+    bool valid4;
+    bool valid5;
+
+    if (input.length() == 4) {
+        valid4 = true;
+        valid5 = true;
+    } else if (input.length() == 6) {
+        valid4 = (input[4] == '=');
+        valid5 = (input[5] == 'q' || input[5] == 'r' || input[5] == 'b' || input[5] == 'k');
+    } else {
+        return;
+    }
+
+    valid0 = (97 <= input[0] && input[0] <= 104);
+    valid1 = (49 <= input[1] && input[1] <= 56);
+    valid2 = (97 <= input[2] && input[2] <= 104);
+    valid3 = (49 <= input[3] && input[3] <= 56);
+    if (!(valid0 && valid1 && valid2 && valid3 && valid4 && valid5)) {
+        return;
+    }
+    int from = (input[0] - 97) + (input[1] - 1) * 8;
+    int to = (input[2] - 97) + (input[3] - 1) * 8;
+    bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
+    if (!moving_own_piece) {
+        return;
+    }
+    
+    Move move(from, to);
+
+    vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+    bool is_legal_move = (find(legal_moves.begin(), legal_moves.end(), move) != legal_moves.end());
+
+    if (!is_legal_move) {
+        return;
+    }
+
+    return move;
+
+}
+
+
 //starts a chess game
 void play(){
     GameState game;
@@ -30,17 +77,26 @@ void play(){
 
         string player_move;
         cin >> player_move;
+
         if (player_move == "quit") game_on = false;
-        int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
-        int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
-        bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
-        bool moving_to_nonally_square = (!game.bb.getWhitePieces() & (1ULL << to));
+        else {
+            optional<Move> move = parseMove(player_move, game);
+            if (move) {
+                game.makeMove(*move);
+            } else {
+                cout << "Invalid move, please try again." << endl;
+            }
+        }
+        // int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
+        // int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
+        // bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
+        // bool moving_to_nonally_square = (!game.bb.getWhitePieces() & (1ULL << to));
 
         
 
-        Move move(from, to);
-        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-        game.makeMove(move); 
+        // Move move(from, to);
+        // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        // game.makeMove(move); 
     }
 }
 
