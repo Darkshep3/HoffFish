@@ -30,6 +30,7 @@ public:
     void placePiece(char piece, int index);
     U64 getWhitePieces();
     U64 getBlackPieces();
+    // void setBit(char piece, int index);
     U64 getOccupied();
     U64 getEmpty();
     char getPieceAt(int index);

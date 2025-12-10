@@ -5,6 +5,7 @@
 // Connected Pawns for bonus 
 
 class Evaluation{
+    //cannot do const static int [2][6] then its initlizing as static means you will define it later 
     const int WHITE = 0;
     const int BLACK = 1;
     const int MAX_GAME_PHASE = 24;
@@ -14,7 +15,7 @@ class Evaluation{
     {94, 281, 297, 512, 936, 12000}}; //endgame
     const int CONNECTED_PAWN_BONUS = 6;
     const int DOUBLE_PAWN_PENALTY = 13;
-    const int ISOLATED_PAWN_PENALTY = 12;
+    const  int ISOLATED_PAWN_PENALTY = 12;
     const int midgamePST [6][64] = 
     {
         //pawn
@@ -128,8 +129,9 @@ class Evaluation{
         -12,  17,  14,  17,  17,  38,  23,  11,
         -74, -35, -18, -18, -11,  15,   4, -17}};
 
-    double evaluate(Bitboard& bb, bool isWhiteToMove);
-    double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
-    int connectedPawnBonus(U64 pawns, int color);
-    int pawnStructurePenalty(U64 pawns, int color);
+    public:
+        static double evaluate(Bitboard& bb, bool isWhiteToMove);
+        static double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
+        static int connectedPawnBonus(U64 pawns, int color);
+        static int pawnStructurePenalty(U64 pawns, int color);
 };

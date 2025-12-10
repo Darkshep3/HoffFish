@@ -13,24 +13,24 @@ void printMoves(const vector<Move>& moves);
 int main ()
 {
     init_magic();
-    testing();
-    //play();
-    testing2();
+    //testing();
+    play();
+    //testing2();
     return 0;
 }
 
 //starts a chess game
-/*void play(){
+void play(){
     GameState game;
     bool game_on = true;
     while (game_on) {
         game.bb.displayBoard();
-        string player_color = game.white_to_move ? "white" : "black";
-        cout << player_color << "enter move: (ex. e2e4)";
-        bool valid_move = false;
+        string player_color = game.white_to_move ? "White: " : "Black: ";
+        cout << player_color << "Enter your move (ex. e2e4), or 'quit' to exit: " << endl;
 
         string player_move;
         cin >> player_move;
+        if (player_move == "quit") game_on = false;
         int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
         int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
         bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
@@ -43,7 +43,7 @@ int main ()
         game.makeMove(move); 
     }
 }
-*/
+
 void testing() {
     cout << "hi this is testing stuff" << endl;
     //GameState game = GameState();
@@ -51,18 +51,8 @@ void testing() {
     game.bb.displayBoard();
 
     MoveGenerator mg;
-    vector<Move> moves;
-    U64 empty = game.bb.getEmpty();
-    U64 white = game.bb.getWhitePieces();
-    U64 black = game.bb.getBlackPieces();
-
-    //mg.generateKingMoves(game.bb, white, empty, true, game.castleBK, game.castleBQ, moves);
-    mg.generateKnightMoves(game.bb, white, true, moves);
-    mg.generatePawnMoves(game.bb, black, empty, game.en_passant, true, moves);
-    mg.generateBishopMoves(game.bb, white, true, moves);
-    mg.generateRookMoves(game.bb, white, true, moves);
-    mg.generateQueenMoves(game.bb, white, true, moves);
-
+    vector<Move> moves = mg.generateLegalMoves(game);
+    
     printMoves(moves);
 
     cout << game.exportFEN() << endl;
