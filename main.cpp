@@ -5,10 +5,11 @@
 #include "magic_generator.h"
 #include <optional>
 #include "Evaluation.h"
+#include "AlphaBetaPruning.h"
 
 using namespace std;
 void testing();
-void play();
+void play(bool is_playing_against_engine, bool is_engine_white);
 void testing2();
 void printMoves(const vector<Move>& moves);
 
@@ -16,7 +17,9 @@ int main ()
 {
     init_magic();
     //testing();
-    play();
+    bool is_playing_against_engine = true;
+    bool is_engine_white = false;
+    play(is_playing_against_engine, is_engine_white);
     //testing2();
     return 0;
 }
@@ -34,9 +37,10 @@ optional<Move> parseMove(string input, GameState game) {
         valid5 = true;
     } else if (input.length() == 6) {
         valid4 = (input[4] == '=');
-        valid5 = (input[5] == 'q' || input[5] == 'r' || input[5] == 'b' || input[5] == 'k');
+        valid5 = (input[5] == 'q' || input[5] == 'r' || input[5] == 'b' || input[5] == 'n');
     } else {
-        return;
+        cout << "wrong input length: " << input.length() << "!= 4 or 6" << endl;
+        return nullopt;
     }
 
     valid0 = (97 <= input[0] && input[0] <= 104);
@@ -44,13 +48,16 @@ optional<Move> parseMove(string input, GameState game) {
     valid2 = (97 <= input[2] && input[2] <= 104);
     valid3 = (49 <= input[3] && input[3] <= 56);
     if (!(valid0 && valid1 && valid2 && valid3 && valid4 && valid5)) {
-        return;
+        cout << "invalid string parse: " << valid0 << valid1 << valid2 << valid3 << valid4 << valid5 << endl;
+        return nullopt;
     }
-    int from = (input[0] - 97) + (input[1] - 1) * 8;
-    int to = (input[2] - 97) + (input[3] - 1) * 8;
-    bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
+    int from = (input[0] - 97) + (input[1] - 49) * 8;
+    int to = (input[2] - 97) + (input[3] - 49) * 8;
+    // cout << "from = " << from << ", to = " << to << endl;
+    bool moving_own_piece = game.white_to_move ? (game.bb.getWhitePieces() & (1ULL << from)) : (game.bb.getBlackPieces() & (1ULL << from));
     if (!moving_own_piece) {
-        return;
+        cout << "must move own piece" << endl;
+        return nullopt;
     }
     
     Move move(from, to);
@@ -59,7 +66,11 @@ optional<Move> parseMove(string input, GameState game) {
     bool is_legal_move = (find(legal_moves.begin(), legal_moves.end(), move) != legal_moves.end());
 
     if (!is_legal_move) {
-        return;
+        cout << "is not legal move" << endl;
+        // Move first_legal_move = legal_moves[0];
+        // cout << first_legal_move.from << " " << first_legal_move.to << endl;
+        // cout << from << " " << to << endl;
+        return nullopt;
     }
 
     return move;
@@ -67,41 +78,82 @@ optional<Move> parseMove(string input, GameState game) {
 }
 
 
+bool isGameOver (GameState game) {
+    //check if the current player has no legal moves or if the halfmove count is above 100 for 50-move rule
+    vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+    bool no_legal_moves = true;
+    for (Move move : legal_moves) {
+        if ((1ULL << move.getFromSquare()) & (game.white_to_move ? game.bb.getWhitePieces() : game.bb.getBlackPieces())) {
+            no_legal_moves = false;
+        }
+    }
+    if (no_legal_moves) {
+        if (MoveGenerator::is_in_check(game.white_to_move, game.bb)) {
+            cout << (game.white_to_move ? "Black" : "White") << " wins by checkmate" << endl;
+        } else {
+            cout << "Draw by stalemate" << endl;
+        }
+        return true;
+    } else if (game.half_moves >= 100) {
+        cout << "Draw by 50-move rule" << endl;
+        return true;
+    }
+    
+    return false;
+}
+
+
 //starts a chess game
-void play(){
+void play(bool is_playing_against_engine, bool is_engine_white){
     GameState game;
     Evaluation e;
     bool game_on = true;
     while (game_on) {
-        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-        printMoves(legal_moves);
+        // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        // printMoves(legal_moves);
         game.bb.displayBoard();
-        cout << "Score: " << e.evaluate(game.bb) << endl;
-        string player_color = game.white_to_move ? "White: " : "Black: ";
-        cout << player_color << "Enter your move (ex. e2e4), or 'quit' to exit: " << endl;
+        // cout << "Score: " << e.evaluate(game.bb) << endl;
 
-        string player_move;
-        cin >> player_move;
+        if (is_playing_against_engine && (game.white_to_move == is_engine_white)) {
 
-        if (player_move == "quit") game_on = false;
-        else {
-            optional<Move> move = parseMove(player_move, game);
-            if (move) {
-                game.makeMove(*move);
-            } else {
-                cout << "Invalid move, please try again." << endl;
+            auto [value, best_move] = alphabeta(game, 4, INT_MIN, INT_MAX, is_engine_white);
+            game.makeMove(best_move);
+
+        } else {
+            string player_color = game.white_to_move ? "White: " : "Black: ";
+            cout << player_color << "Enter your move (ex. e2e4), or 'quit' to exit: " << endl;
+
+            string player_move;
+            cin >> player_move;
+
+            if (player_move == "quit") game_on = false;
+            else {
+                optional<Move> move = parseMove(player_move, game);
+                if (move) {
+                    game.makeMove(*move);
+                } else {
+                    cout << "Invalid move, please try again." << endl;
+                }
             }
         }
+
+
+
+        if (isGameOver(game)) {
+            game_on = false;
+        }
+
+
+
         // int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
         // int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
         // bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
         // bool moving_to_nonally_square = (!game.bb.getWhitePieces() & (1ULL << to));
 
-        
+        // Move move(from, to);
+        // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+        // game.makeMove(move); 
 
-        Move move(from, to);
-        vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-        game.makeMove(move); 
     }
 }
 

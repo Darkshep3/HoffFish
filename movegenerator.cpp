@@ -174,7 +174,7 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
         //if legal, store to legal_moves
         if(!is_in_check(!state.white_to_move, state.bb))
         {
-            cout << state.white_to_move << endl;
+            // cout << state.white_to_move << endl;
             legal_moves.push_back(m);
         }
         //unmake move

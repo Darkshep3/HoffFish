@@ -84,6 +84,10 @@ public:
             moveType == MoveType::PROMOTION_KNIGHT;
     }
 
+    bool operator==(const Move& other) const {
+        return (from == other.from && to == other.to);
+    }
+
 
 private:
     MoveType getPromotionMoveType(char promotion){
