@@ -66,7 +66,7 @@
     U64 enemy_attacks = king_attacks | knights_attacks | rooks_attacks | bishops_attacks | queens_attacks | pawns_attacks;
 
     //if king is on any of those squares in the bb -> true
-    while(enemy_attacks !=0)
+    while(enemy_attacks != 0ULL)
     {
         if(square == get_LSB(enemy_attacks))
         {
@@ -156,7 +156,7 @@ bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
     //determine which side we are checking for (black / white)
     U64 king = check_for_white ? bb.wking : bb.bking;  
     int sq = get_LSB(king); 
-
+    
     return isAttackedSquare(bb, sq, check_for_white);
 }
 
@@ -172,10 +172,12 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
         //make move and check legality
         Delta delta = state.deltaMove(m);    
         //if legal, store to legal_moves
-        if(!is_in_check(!state.white_to_move, state.bb))
+        if(!is_in_check(delta.white_to_move, state.bb))
         {
-            cout << state.white_to_move << endl;
             legal_moves.push_back(m);
+        }
+        else {
+            cout << "POP" << endl;
         }
         //unmake move
         state.unmakeMove(delta);
