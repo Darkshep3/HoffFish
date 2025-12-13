@@ -2,5 +2,11 @@
 #include "GameState.h"
 #include "movegenerator.h"
 #include "Evaluation.h"
+using namespace std;
 
-double alphabeta(GameState game, int depth, double alpha, double beta, bool maximizing_player);
+struct SearchResult {
+    double value;
+    Move move;
+};
+
+SearchResult alphabeta(GameState game, int depth, double alpha, double beta, bool maximizing_player);

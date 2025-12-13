@@ -1,5 +1,4 @@
 #include "movegenerator.h"
-#include <iostream> 
 
  bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool check_for_white){
     //allies bit board
@@ -29,7 +28,7 @@
     while(rooks != 0)
     {
         int sq = get_LSB(rooks);
-        U64 current_attacks = getRookAttacks(sq, bb.getOccupied(), allies);
+        U64 current_attacks = getRookAttacks(sq, bb.getOccupied(), 0ULL);
         rooks_attacks = rooks_attacks | current_attacks;
         clear_LSB(rooks);
     }
@@ -39,7 +38,7 @@
     while(bishops != 0)
     {
         int sq = get_LSB(bishops);
-        U64 current_attacks = getBishopAttacks(sq, bb.getOccupied(), allies);
+        U64 current_attacks = getBishopAttacks(sq, bb.getOccupied(), 0ULL);
         bishops_attacks = bishops_attacks | current_attacks;
         clear_LSB(bishops);
     }
@@ -49,7 +48,7 @@
     while(queens != 0)
     {
         int sq = get_LSB(queens);
-        U64 current_attacks = getQueenAttacks(sq, bb.getOccupied(), allies);
+        U64 current_attacks = getQueenAttacks(sq, bb.getOccupied(), 0ULL);
         queens_attacks = queens_attacks | current_attacks;
         clear_LSB(queens);
     }
@@ -57,8 +56,11 @@
     //no loops, just shift
     U64 pawns = check_for_white ? bb.bpawns : bb.wpawns;
 
-    U64 pawns_attacks_left = check_for_white ? pawns >> 9 : pawns << 7; //small change but nothing major 
-    U64 pawns_attacks_right = check_for_white ? pawns >> 7 : pawns << 9;
+    const U64 notA = 0xfefefefefefefefeULL;
+    const U64 notH = 0x7f7f7f7f7f7f7f7fULL;
+
+    U64 pawns_attacks_left = check_for_white ? (pawns & notH) >> 7 : ( pawns & notA) << 7; 
+    U64 pawns_attacks_right = check_for_white ? (pawns & notA) >> 9 : (pawns & notH) << 9;
 
     U64 pawns_attacks = pawns_attacks_left | pawns_attacks_right;
 
@@ -174,10 +176,8 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
         //if legal, store to legal_moves
         if(!is_in_check(delta.white_to_move, state.bb))
         {
+            // cout << state.white_to_move << endl;
             legal_moves.push_back(m);
-        }
-        else {
-            cout << "POP" << endl;
         }
         //unmake move
         state.unmakeMove(delta);

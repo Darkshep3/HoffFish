@@ -77,15 +77,17 @@ public:
         s += rank;
         return s;
     }
-    bool isPromotion() {
+    bool isPromotion() const{
         return moveType == MoveType::PROMOTION_QUEEN ||
             moveType == MoveType::PROMOTION_ROOK ||
             moveType == MoveType::PROMOTION_BISHOP ||
             moveType == MoveType::PROMOTION_KNIGHT;
     }
 
+    bool operator==(const Move& other) const {
+        return from == other.from && to == other.to;
+    }
 
-private:
     MoveType getPromotionMoveType(char promotion){
         switch(promotion){
             case 'q': return MoveType::PROMOTION_QUEEN;

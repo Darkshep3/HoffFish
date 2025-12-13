@@ -30,6 +30,6 @@ public:
         castleBK(castleBK), castleBQ(castleBQ),
         enPassant(enPassant), 
         halfCount(halfCount), fullCount(fullCount), 
-        moveType(moveType)
+        moveType(movetype)
         {}
     };

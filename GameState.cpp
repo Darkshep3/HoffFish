@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <sstream>
 #include "GameState.h"
@@ -223,7 +222,7 @@ string GameState::exportFEN(){
 
     //write en passant square (if it exists)
     if (en_passant != -1) {
-        int square = __builtin_ctzll(en_passant);
+        int square = en_passant;
         int rank = square / 8; // 0-7
         int file = square % 8; // 0-7
         strm << char(file + 97) << (rank + 1);
@@ -240,7 +239,6 @@ string GameState::exportFEN(){
 }
 
 void GameState::makeMove(Move move) {
-
     int from = move.getFromSquare();
     int to = move.getToSquare();
     MoveType type = move.getMoveType();
@@ -422,6 +420,7 @@ Delta GameState::deltaMove (Move move){
     Delta delta = Delta(from, to, piece, captured, promoPiece, white_to_move, castleWK,
     castleWQ, castleBK, castleBQ, en_passant, half_moves, full_moves, moveType);
     makeMove(move);
+
     return delta;
 };
     

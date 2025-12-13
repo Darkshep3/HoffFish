@@ -1,3 +1,4 @@
+#pragma once
 #include "Bitboard.h"
 //Piece Square Table 
 //Would a piece be worth the same during a midgame or endgame 
