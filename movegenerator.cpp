@@ -169,12 +169,15 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
     vector<Move> pseudo_moves = generatePseudoMoves(state);
     //empty list of legal moves
     vector<Move> legal_moves;
+
+    bool isWhite = state.white_to_move;
+
     for(const Move m: pseudo_moves)
     {
         //make move and check legality
         Delta delta = state.deltaMove(m);    
         //if legal, store to legal_moves
-        if(!is_in_check(delta.white_to_move, state.bb))
+        if(!is_in_check(isWhite, state.bb))
         {
             // cout << state.white_to_move << endl;
             legal_moves.push_back(m);

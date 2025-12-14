@@ -12,6 +12,7 @@ enum class MoveType {
     CAPTURES
 };
 
+
 class Move{
 public:
     int from;
@@ -19,7 +20,7 @@ public:
     char captured;
     char promotion;
     MoveType moveType;
-
+    Move() : from (-1), to(-1), captured(' '), promotion(' '), moveType(MoveType::NORMAL){}
 
     //the constructor
     Move(int from, int to)

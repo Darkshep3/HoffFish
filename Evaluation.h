@@ -15,7 +15,7 @@ class Evaluation{
     {94, 281, 297, 512, 936, 12000}}; //endgame
     static const int CONNECTED_PAWN_SCORE = 6;
     static const int DOUBLE_PAWN_SCORE = 13;
-    static const  int ISOLATED_PAWN_SCORE = 12;
+    static const  int ISOLATED_PAWN_SCORE = 7;
     static constexpr int midgamePST [6][64] = 
     {
         //pawn

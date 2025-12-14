@@ -1,14 +1,13 @@
 #include <iostream>
-#include "GameState.h"
-#include "movegenerator.h"
 #include <cstdlib> 
 #include "magic_generator.h"
 #include <optional>
-#include "Evaluation.h"
-#include "AlphaBetaPruning.h"
+#include "Search.h"
 #include <algorithm>
 
 using namespace std;
+
+const int SEARCH_DEPTH = 5;
 void testing();
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white);
 void testing2();
@@ -18,10 +17,11 @@ int main ()
 {
     GameState game;
     //GameState game("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    //GameState game("rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 2");
     init_magic();
     //testing();
     bool is_playing_against_engine = true;
-    bool is_engine_white = false;
+    bool is_engine_white = true;
     play(game, is_playing_against_engine, is_engine_white);
     //testing2();
     return 0;
@@ -89,7 +89,7 @@ optional<Move> parseMove(string input, GameState game) {
 bool isGameOver (GameState game) {
     //check if the current player has no legal moves or if the halfmove count is above 100 for 50-move rule
     vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-    //printMoves(legal_moves);
+    printMoves(legal_moves);
     bool no_legal_moves = true;
     for (Move move : legal_moves) {
         if ((1ULL << move.getFromSquare()) & (game.white_to_move ? game.bb.getWhitePieces() : game.bb.getBlackPieces())) {
@@ -112,9 +112,9 @@ bool isGameOver (GameState game) {
 }
 
 
-//starts a chess game
+//starts a chess gamed
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
-    Evaluation e;
+    Search engine = Search();
     bool game_on = true;
     while (game_on) {
         // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
@@ -123,11 +123,11 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
         // cout << "Score: " << e.evaluate(game.bb) << endl;
 
         if (is_playing_against_engine && (game.white_to_move == is_engine_white)) {
-
-            auto [value, best_move] = alphabeta(game, 4, INT_MIN, INT_MAX, is_engine_white);
-            game.makeMove(best_move);
-
-        } else {
+            Move topEngine = engine.findBestMove(game, SEARCH_DEPTH);
+            //cout << "Engine plays: " << topEngine.squareToAlgebraic(topEngine.from) << topEngine.squareToAlgebraic(topEngine.to) << endl;
+            game.makeMove(topEngine);
+        } 
+        else {
             string player_color = game.white_to_move ? "White: " : "Black: ";
             cout << player_color << "Enter your move (ex. e2e4), or 'quit' to exit: " << endl;
 

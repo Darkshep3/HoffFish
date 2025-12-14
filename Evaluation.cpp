@@ -1,5 +1,6 @@
 #include "Bitboard.h"
 #include "Evaluation.h"
+
 double Evaluation::evaluate(Bitboard& bb) {
     int gamePhase = 0;
     double score = 0;
@@ -50,7 +51,7 @@ double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
         int sq = __builtin_ctzll(bb);
         bb &= bb - 1;
 
-        int idx = (color == WHITE ? sq : sq ^ 56); //using sq ^ 56 to make it faster as it uses a single bitwise operation over 63 -sq fetching 63 constant subtracting sq and storing result
+        int idx = (color == WHITE ? sq : sq ^ 56); //using sq ^ 56 to make it faster with only vertical rotation versus ur original which is 63-sq and does horizontal shift (incorrect)
 
         mgScore += PIECE_VALUES[0][pieceType] + midgamePST[pieceType][idx];
         egScore += PIECE_VALUES[1][pieceType] + endgamePST[pieceType][idx];
@@ -61,64 +62,42 @@ double Evaluation::scorePiece(U64 bb, int pieceType, int color, int gamePhase) {
 int Evaluation::connectedPawnBonus(U64 pawns, int color) {
     int bonus = 0;
 
-    while (pawns) {
-        int sq = __builtin_ctzll(pawns);
-        pawns &= pawns - 1;
-
-        int file = sq % 8;
-
-        bool leftFile = (file > 0);
-        bool rightFile = (file < 7);
-
-        // masks for adjacent files
-        U64 leftMask  = leftFile  ? (0x0101010101010101ULL << (file - 1)) : 0;
-        U64 rightMask = rightFile ? (0x0101010101010101ULL << (file + 1)) : 0;
-
-        if (((pawns & leftMask) != 0) || ((pawns & rightMask) != 0)) {
-            bonus += CONNECTED_PAWN_SCORE;
-        }
+    if (color == WHITE){
+        U64 leftConnected = pawns & ((pawns & ~FILE_A) << 7); //not File A
+        U64 rightConnected = pawns & ((pawns & ~FILE_H) << 9); //not File H
+        bonus += __builtin_popcount(leftConnected) * CONNECTED_PAWN_SCORE;
+        bonus += __builtin_popcount(rightConnected) * CONNECTED_PAWN_SCORE; 
     }
-
+    else{
+        U64 leftConnected = pawns & ((pawns & ~FILE_A) >> 9); //not File A
+        U64 rightConnected = pawns & ((pawns & ~FILE_H) >> 7); //not File H
+        bonus += __builtin_popcount(leftConnected) * CONNECTED_PAWN_SCORE;
+        bonus += __builtin_popcount(rightConnected) * CONNECTED_PAWN_SCORE; 
+    }
     return bonus;
 }
 int Evaluation::pawnStructurePenalty(U64 pawns, int color) {
     int penalty = 0;
 
-    U64 original = pawns;
+    //double pawns penalty
+    U64 doubled = (color==0) ? (pawns & (pawns << 8)) : (pawns & (pawns >> 8));
+    U64 fileMask = ((pawns & FILE_A) != 0 ? 1ULL : 0ULL) |
+    ((pawns & FILE_B) != 0 ? 2ULL : 0ULL) |
+    ((pawns & FILE_C) != 0 ? 4ULL : 0ULL) |
+    ((pawns & FILE_D) != 0 ? 8ULL : 0ULL) |
+    ((pawns & FILE_E) != 0 ? 16ULL : 0ULL) |
+    ((pawns & FILE_F) != 0 ? 32ULL : 0ULL) |
+    ((pawns & FILE_G) != 0 ? 64ULL : 0ULL) |
+    ((pawns & FILE_H) != 0 ? 128ULL : 0ULL);
 
-    // count file occupancy
-    int fileCount[8] = {0};
+    long isolatedFiles = fileMask & ~(fileMask << 1) & ~(fileMask >> 1);
 
-    U64 tmp = pawns;
-    while (tmp) {
-        int sq = __builtin_ctzll(tmp);
-        tmp &= tmp - 1;
-
-        int file = sq % 8;
-        fileCount[file]++;
-    }
-
-    // doubled pawn penalty
-    for (int f = 0; f < 8; f++) {
-        if (fileCount[f] > 1) {
-            penalty += DOUBLE_PAWN_SCORE * (fileCount[f] - 1);
+    for (int f = 0; f < 8; f++){
+        if ((isolatedFiles & (1ULL << f)) != 0){
+            penalty += __builtin_popcount(pawns & FILES[f]) * ISOLATED_PAWN_SCORE;
         }
     }
 
-    // isolated pawn penalty
-    while (pawns) {
-        int sq = __builtin_ctzll(pawns);
-        pawns &= pawns - 1;
-
-        int file = sq % 8;
-
-        bool hasLeft  = (file > 0 && fileCount[file - 1] > 0);
-        bool hasRight = (file < 7 && fileCount[file + 1] > 0);
-
-        if (!hasLeft && !hasRight) {
-            penalty += ISOLATED_PAWN_SCORE;
-        }
-    }
-
+    penalty += __builtin_popcount(doubled) * DOUBLE_PAWN_SCORE;
     return penalty;
 }

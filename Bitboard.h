@@ -10,7 +10,17 @@ typedef uint64_t U64;
 inline void clear_LSB(U64 &b) {
     b &= (b - 1);
 }
-
+constexpr U64 FILE_A = 0x0101010101010101ULL;
+constexpr U64 FILE_B = 0x0202020202020202ULL;
+constexpr U64 FILE_C = 0x0404040404040404ULL;
+constexpr U64 FILE_D = 0x0808080808080808ULL;
+constexpr U64 FILE_E = 0x1010101010101010ULL;
+constexpr U64 FILE_F = 0x2020202020202020ULL;
+constexpr U64 FILE_G = 0x4040404040404040ULL;
+constexpr U64 FILE_H = 0x8080808080808080ULL;
+constexpr U64 FILES[8] = {
+    FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, 
+};
 
 class Bitboard {
 public:
