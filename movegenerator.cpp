@@ -172,7 +172,7 @@ vector<Move> MoveGenerator::generateLegalMoves(GameState& state)
 
     bool isWhite = state.white_to_move;
 
-    for(const Move m: pseudo_moves)
+    for(const Move& m: pseudo_moves)
     {
         //make move and check legality
         Delta delta = state.deltaMove(m);    

@@ -10,7 +10,9 @@ Search::Search (int time_limit) : timeLimitMs(time_limit), timeUp(false), search
 void Search::setSearchDepth(int depth){
     searchDepth = depth;
 }
-
+void Search::setTimeLimitMs(int ms) {
+    timeLimitMs = ms;
+}
 double Search::alphabeta(GameState& game, int depth, double alpha, double beta, int maxDepth) {
 
     if (timeExceeded()){
@@ -29,11 +31,12 @@ double Search::alphabeta(GameState& game, int depth, double alpha, double beta, 
         else 
             return DRAW_SCORE;
     }
+    orderMoves(moves);
 
     bool maximizing = game.white_to_move;
     if (maximizing) {
         double value = -1e9;
-        for (Move move : moves) {
+        for (Move& move : moves) {
             //Also modified your previous approach as creating a new gamestate instead of delta is alot more inefficient
             Delta d = game.deltaMove(move);
             double score = alphabeta(game, depth - 1, alpha, beta, maxDepth);
@@ -51,7 +54,7 @@ double Search::alphabeta(GameState& game, int depth, double alpha, double beta, 
     } else {
         double value = 1e9;
         Move best_move = Move(-1,-1);
-        for (Move move : moves) {
+        for (Move& move : moves) {
             Delta d = game.deltaMove(move);
             double score = alphabeta(game, depth - 1, alpha, beta, maxDepth);
             game.unmakeMove(d);
@@ -92,7 +95,7 @@ Move Search::alphaBetaRoot(GameState& game, int depth){
     double alpha = -1e9;
     double beta = 1e9;
 
-    for (Move move: legalMoves){
+    for (Move& move: legalMoves){
         if (timeExceeded()){
             break;
         }

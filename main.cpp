@@ -4,7 +4,7 @@
 #include <optional>
 #include "Search.h"
 #include <algorithm>
-
+#include "UCI.h"
 using namespace std;
 
 const int SEARCH_DEPTH = 5;
@@ -15,13 +15,16 @@ void printMoves(const vector<Move>& moves);
 
 int main ()
 {
+    //uciLoop();
+
+    //Original Terminal Mode
     GameState game;
     //GameState game("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-    //GameState game("rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 2");
+    //GameState game("r1bqkbnr/pppppppp/8/8/1nPP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 2 3");
     init_magic();
     //testing();
     bool is_playing_against_engine = true;
-    bool is_engine_white = true;
+    bool is_engine_white = false;
     play(game, is_playing_against_engine, is_engine_white);
     //testing2();
     return 0;
@@ -89,7 +92,7 @@ optional<Move> parseMove(string input, GameState game) {
 bool isGameOver (GameState game) {
     //check if the current player has no legal moves or if the halfmove count is above 100 for 50-move rule
     vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-    printMoves(legal_moves);
+    //printMoves(legal_moves);
     bool no_legal_moves = true;
     for (Move move : legal_moves) {
         if ((1ULL << move.getFromSquare()) & (game.white_to_move ? game.bb.getWhitePieces() : game.bb.getBlackPieces())) {
@@ -114,7 +117,7 @@ bool isGameOver (GameState game) {
 
 //starts a chess gamed
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
-    Search engine = Search();
+    Search engine = Search(1000);
     bool game_on = true;
     while (game_on) {
         // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);

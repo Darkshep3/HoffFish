@@ -1,3 +1,4 @@
+#pragma once
 #include "movegenerator.h"
 #include "Evaluation.h"
 #include <chrono> 
@@ -14,6 +15,7 @@ public:
     Search(int timeLimit);
     void setSearchDepth(int depth);
     Move findBestMove(GameState& game, int maxDepth);
+    void setTimeLimitMs(int ms);
 private:
     Move findBestMoveIterative(GameState& game, int maxDepth);
     Move alphaBetaRoot(GameState& gameState, int depth);
