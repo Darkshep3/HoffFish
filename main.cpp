@@ -116,7 +116,7 @@ bool is_game_over (GameState game)
 }
 
 
-//starts a chess gamed
+//starts a chess game
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
 {
     Search engine = Search(1200);

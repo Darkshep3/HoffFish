@@ -27,6 +27,7 @@ U64 compute_ratt(int sq, U64 block);
 U64 compute_batt(int sq, U64 block);
 U64 index_to_U64(int index, int bits, U64 mask);
 
+//Removing the 1st bit
 inline int pop_1st_bit(U64 &bb)
 {
     int index = get_LSB(bb);
@@ -34,6 +35,7 @@ inline int pop_1st_bit(U64 &bb)
     return index;
 }
 
+//Hash Function
 inline int transform (U64 b, U64 magic, int bits)
 {
     return (int) ((b*magic) >> (64-bits));

@@ -1,6 +1,8 @@
 #pragma once 
 #include "Move.h"
 
+//Essentially gamestate but with all the functions 
+//Stores only the important details for a chess game (FEN values)
 class Delta {
 public: 
     int from, to;

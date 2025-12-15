@@ -178,6 +178,7 @@ void init_bmask()
     }
 }
 
+//Creating the attack table for each hash now that you have the magicnum 
 void init_magic_tables()
 {
     //initializing rook attack tables
