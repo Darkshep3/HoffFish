@@ -11,14 +11,14 @@ public:
     static vector<Move> generate_pseudo_moves(GameState& state);
     static vector<Move> generate_legal_moves(GameState& state); 
 //private:
-    static void generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
-    static void generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
-    static void generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves);
-    static void generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
-    static void generateRookMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
-    static void generateQueenMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
+    static void generate_pawn_moves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
+    static void generate_knight_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
+    static void generate_king_moves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves);
+    static void generate_bishop_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
+    static void generate_rook_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
+    static void generate_queen_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);
 
-    static bool isAttackedSquare( Bitboard& bb, int square, bool isWhite);
+    static bool is_attacked_square( Bitboard& bb, int square, bool isWhite);
     static bool is_in_check(bool white_to_move, Bitboard bb); 
 
 
