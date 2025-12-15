@@ -4,7 +4,6 @@
 #include <optional>
 #include "Search.h"
 #include <algorithm>
-#include "UCI.h"
 using namespace std;
 
 const int SEARCH_DEPTH = 5;
@@ -15,7 +14,6 @@ void print_moves(const vector<Move>& moves);
 
 int main ()
 {
-    //uci_loop();
 
     //Original Terminal Mode
     GameState game;
@@ -26,7 +24,7 @@ int main ()
     bool is_playing_against_engine = true;
     bool is_engine_white = false;
     play(game, is_playing_against_engine, is_engine_white);
-    //testing2();
+    //testing2();i
     return 0;
 }
 
