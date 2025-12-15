@@ -15,7 +15,7 @@ void print_moves(const vector<Move>& moves);
 
 int main ()
 {
-    //uciLoop();
+    //uci_loop();
 
     //Original Terminal Mode
     GameState game;
@@ -130,7 +130,7 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
         // cout << "Score: " << e.evaluate(game.bb) << endl;
 
         if (is_playing_against_engine && (game.white_to_move == is_engine_white)) {
-            Move top_engine = engine.findBestMove(game, SEARCH_DEPTH);
+            Move top_engine = engine.find_best_move(game, SEARCH_DEPTH);
             //cout << "Engine plays: " << top_engine.square_to_algebraic(top_engine.from) << top_engine.square_to_algebraic(top_engine.to) << endl;
             game.make_move(top_engine);
         } 

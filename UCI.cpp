@@ -27,17 +27,17 @@ static int clamp(int v, int lo, int hi)
 // ---------------------------
 // Convert UCI algebraic (e2e4, g7g8q) -> internal Move
 // ---------------------------
-optional<Move> parseMove(const string &input, GameState &game) 
+optional<Move> parse_move(const string &input, GameState &game) 
 {
     if (input.length() < 4) return nullopt;
 
-    int fromFile = input[0] - 'a';
-    int fromRank = input[1] - '1';
-    int toFile   = input[2] - 'a';
-    int toRank   = input[3] - '1';
+    int from_file = input[0] - 'a';
+    int from_rank = input[1] - '1';
+    int to_file   = input[2] - 'a';
+    int to_rank   = input[3] - '1';
 
-    int from = fromRank * 8 + fromFile;
-    int to   = toRank * 8 + toFile;
+    int from = from_rank * 8 + from_file;
+    int to   = to_rank * 8 + to_file;
 
     char promo = '\0';
     if (input.length() == 5) 
@@ -70,7 +70,7 @@ optional<Move> parseMove(const string &input, GameState &game)
 // ---------------------------
 // Parse UCI "position" command
 // ---------------------------
-static void parsePosition(const string &line) 
+static void parse_position(const string &line) 
 {
     stringstream ss(line);
     string token;
@@ -97,7 +97,7 @@ static void parsePosition(const string &line)
     {
         while (ss >> token) 
         {
-            auto m = parseMove(token, game);
+            auto m = parse_move(token, game);
             if (!m) 
             {
                 cerr << "WARNING: Illegal move in UCI position: " << token << endl;
@@ -111,7 +111,7 @@ static void parsePosition(const string &line)
 // ---------------------------
 // UCI main loop
 // ---------------------------
-void uciLoop() {
+void uci_loop() {
     string line;
     while (getline(cin, line)) 
     {
@@ -132,7 +132,7 @@ void uciLoop() {
         } 
         else if (line.rfind("position", 0) == 0) 
         {
-            parsePosition(line);
+            parse_position(line);
         } 
         else if (line.rfind("go", 0) == 0) 
         {
@@ -156,16 +156,16 @@ void uciLoop() {
             }
 
             // Time allocation
-            int timeForMove = 1000; // default 1s
-            if (movetime != -1) timeForMove = movetime;
-            else if (game.white_to_move && wtime != -1) timeForMove = wtime / 30 + winc;
-            else if (!game.white_to_move && btime != -1) timeForMove = btime / 30 + binc;
-            timeForMove = clamp(timeForMove, 50, 5000);
+            int time_for_move = 1000; // default 1s
+            if (movetime != -1) time_for_move = movetime;
+            else if (game.white_to_move && wtime != -1) time_for_move = wtime / 30 + winc;
+            else if (!game.white_to_move && btime != -1) time_for_move = btime / 30 + binc;
+            time_for_move = clamp(time_for_move, 50, 5000);
 
-            engine.setTimeLimitMs(timeForMove);
+            engine.set_time_limit_ms(time_for_move);
 
             // Search
-            Move best = engine.findBestMove(game, depth);
+            Move best = engine.find_best_move(game, depth);
 
             // Output UCI move
             cout << "bestmove " 
