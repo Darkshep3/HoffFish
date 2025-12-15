@@ -89,7 +89,7 @@ GameState::GameState(const string& fen)
                 //7-rank bc fen begins on 8th rank and goes to 1st
 
                 //set_bit(current_char, square);
-                bb.placePiece(current_char, square);
+                bb.place_piece(current_char, square);
 
                 //put that piece on the bb
                 file++;
@@ -159,23 +159,27 @@ GameState::GameState(const string& fen)
 
 };
 
-string GameState::exportFEN(){
+string GameState::export_FEN()
+{
 
     ostringstream strm;
 
     //write bitbb data to FEN format
-    int emptySpaces = 0;
-    for (int rank=7; rank>=0; rank--){
+    int empty_spaces = 0;
+    for (int rank=7; rank>=0; rank--)
+    {
         for (int file=0; file<8; file++){
             int square = rank * 8 + file;
 
-            if (!((bb.getBlackPieces() | bb.getWhitePieces()) & 1ULL << square)) {
-                emptySpaces++;
-            } else {
-                if (emptySpaces != 0) {
-                    strm << emptySpaces;
+            if (!((bb.get_black_pieces() | bb.get_white_pieces()) & 1ULL << square)) 
+            {
+                empty_spaces++;
+            } else 
+            {
+                if (empty_spaces != 0) {
+                    strm << empty_spaces;
                 }
-                emptySpaces = 0;
+                empty_spaces = 0;
             }
 
             if (bb.brooks & (1ULL << square)) strm << 'r';
@@ -192,12 +196,14 @@ string GameState::exportFEN(){
             else if (bb.wpawns & (1ULL << square)) strm << 'P';
         }
 
-        if (emptySpaces != 0) {
-            strm << emptySpaces;
+        if (empty_spaces != 0) 
+        {
+            strm << empty_spaces;
         }
-        emptySpaces = 0;
+        empty_spaces = 0;
 
-        if(rank != 0) {
+        if(rank != 0) 
+        {
             strm << '/';
         }
 
@@ -205,9 +211,11 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write next player to move
-    if (white_to_move) {
+    if (white_to_move) 
+    {
         strm << 'w';
-    } else {
+    } else 
+    {
         strm << 'b';
     }
     strm << ' ';
@@ -221,7 +229,8 @@ string GameState::exportFEN(){
     strm << ' ';
 
     //write en passant square (if it exists)
-    if (en_passant != -1) {
+    if (en_passant != -1) 
+    {
         int square = en_passant;
         int rank = square / 8; // 0-7
         int file = square % 8; // 0-7
@@ -238,34 +247,39 @@ string GameState::exportFEN(){
 
 }
 
-void GameState::makeMove(Move move) {
-    int from = move.getFromSquare();
-    int to = move.getToSquare();
-    MoveType type = move.getMoveType();
-    char piece = bb.getPieceAt(from);
-    char captured = bb.getPieceAt(to);
-    char promo = move.getPromotionPiece();
+void GameState::make_move(Move move) 
+{
+    int from = move.get_from_square();
+    int to = move.get_to_square();
+    MoveType type = move.get_move_type();
+    char piece = bb.get_piece_at(from);
+    char captured = bb.get_piece_at(to);
+    char promo = move.get_promotion_piece();
 
     // clear any en-passant from previous turn
     en_passant = -1;
 
     // remove captured piece first (except en passant, addressed later)
-    if (captured != ' ' && type != MoveType::EN_PASSANT) {
-        bb.clearSquare(to);
+    if (captured != ' ' && type != MoveType::EN_PASSANT) 
+    {
+        bb.clear_square(to);
         half_moves = 0;   // capture resets halfmove counter
     }
 
     // en passant
-    if (type == MoveType::EN_PASSANT) {
+    if (type == MoveType::EN_PASSANT) 
+    {
         int capSq = white_to_move ? (to - 8) : (to + 8);
-        bb.clearSquare(capSq);
+        bb.clear_square(capSq);
         half_moves = 0;
     }
 
     // half_move counter
-    if (piece == 'P' || piece == 'p') {
+    if (piece == 'P' || piece == 'p') 
+    {
         half_moves = 0;
-    } else {
+    } else 
+    {
         half_moves++;
     }
 
@@ -273,50 +287,67 @@ void GameState::makeMove(Move move) {
     if (!white_to_move) full_moves++;
 
     // move piece
-    bb.clearSquare(from);
+    bb.clear_square(from);
 
     // castling
-    if (type == MoveType::CASTLING) {
+    if (type == MoveType::CASTLING) 
+    {
         // king side
-        if (to == from + 2) {
-            if (white_to_move) {
-                bb.clearSquare(7);
-                bb.placePiece('R', 5);
-            } else {
-                bb.clearSquare(63);
-                bb.placePiece('r', 61);
+        if (to == from + 2) 
+        {
+            if (white_to_move) 
+            {
+                bb.clear_square(7);
+                bb.place_piece('R', 5);
+            } else 
+            {
+                bb.clear_square(63);
+                bb.place_piece('r', 61);
             }
         }
         // queen side
-        else if (to == from - 2) {
-            if (white_to_move) {
-                bb.clearSquare(0);
-                bb.placePiece('R', 3);
-            } else {
-                bb.clearSquare(56);
-                bb.placePiece('r', 59);
+        else if (to == from - 2) 
+        {
+            if (white_to_move) 
+            {
+                bb.clear_square(0);
+                bb.place_piece('R', 3);
+            } else 
+            {
+                bb.clear_square(56);
+                bb.place_piece('r', 59);
             }
         }
     }
 
     // promotion
-    if (move.isPromotion()) {
-        bb.placePiece(promo, to);
-    } else {
-        bb.placePiece(piece, to);
+    if (move.is_promotion()) 
+    {
+        bb.place_piece(promo, to);
+    } else 
+    {
+        bb.place_piece(piece, to);
     }
 
     // pawn double push: set en-passant square 
-    if (piece == 'P' && from / 8 == 1 && to == from + 16) {
+    if (piece == 'P' && from / 8 == 1 && to == from + 16) 
+    {
         en_passant = from + 8;
     }
-    if (piece == 'p' && from / 8 == 6 && to == from - 16) {
+    if (piece == 'p' && from / 8 == 6 && to == from - 16) 
+    {
         en_passant = from - 8;
     }
 
     // update castling rights
-    if (piece == 'K') { castleWK = castleWQ = false; }
-    if (piece == 'k') { castleBK = castleBQ = false; }
+    if (piece == 'K') 
+    { 
+        castleWK = castleWQ = false; 
+    }
+    if (piece == 'k') 
+    { 
+        castleBK = castleBQ = false; 
+    }
 
     if (from == 0 || to == 0) castleWQ = false;
     if (from == 7 || to == 7) castleWK = false;
@@ -327,7 +358,8 @@ void GameState::makeMove(Move move) {
     white_to_move = !white_to_move;
 }
 
-void GameState::unmakeMove(const Delta &d) {
+void GameState::unmake_move(const Delta &d) 
+{
 
     // restore global state
     white_to_move = d.white_to_move;
@@ -335,14 +367,14 @@ void GameState::unmakeMove(const Delta &d) {
     castleWQ = d.castleWQ;
     castleBK = d.castleBK;
     castleBQ = d.castleBQ;
-    en_passant = d.enPassant;
-    half_moves = d.halfCount;
-    full_moves = d.fullCount;
+    en_passant = d.en_passant;
+    half_moves = d.half_count;
+    full_moves = d.full_count;
 
-    MoveType type = d.moveType;
+    MoveType type = d.move_type;
 
     // remove piece from moved to square
-    bb.clearSquare(d.to);
+    bb.clear_square(d.to);
 
     // undo promotion
     if (type == MoveType::PROMOTION_QUEEN ||
@@ -351,49 +383,60 @@ void GameState::unmakeMove(const Delta &d) {
         type == MoveType::PROMOTION_KNIGHT) 
     {
         // restore pawn
-        char pawn = (d.movedPiece == 'P' ? 'P' : 'p');
-        bb.placePiece(pawn, d.from);
+        char pawn = (d.moved_piece == 'P' ? 'P' : 'p');
+        bb.place_piece(pawn, d.from);
     }
-    else {
+    else 
+    {
         // restore piece on original square
-        bb.placePiece(d.movedPiece, d.from);
+        bb.place_piece(d.moved_piece, d.from);
     }
 
     // restore captured piece
-    if (d.capturedPiece != ' ') {
+    if (d.captured_piece != ' ') 
+    {
         // normal capture
-        if (type != MoveType::EN_PASSANT) {
-            bb.placePiece(d.capturedPiece, d.to);
+        if (type != MoveType::EN_PASSANT) 
+        {
+            bb.place_piece(d.captured_piece, d.to);
         }
         // en passant
-        else {
-            int capSq = (d.movedPiece == 'P' ? d.to - 8 : d.to + 8);
-            bb.placePiece(d.capturedPiece, capSq);
+        else 
+        {
+            int capSq = (d.moved_piece == 'P' ? d.to - 8 : d.to + 8);
+            bb.place_piece(d.captured_piece, capSq);
         }
     }
 
     // undo castling
-    if (type == MoveType::CASTLING) {
-        if (d.movedPiece == 'K') {
+    if (type == MoveType::CASTLING) 
+    {
+        if (d.moved_piece == 'K') 
+        {
             // king side
-            if (d.to == d.from + 2) {
-                bb.clearSquare(5);
-                bb.placePiece('R', 7);
+            if (d.to == d.from + 2) 
+            {
+                bb.clear_square(5);
+                bb.place_piece('R', 7);
             }
             // queen side
-            else if (d.to == d.from - 2) {
-                bb.clearSquare(3);
-                bb.placePiece('R', 0);
+            else if (d.to == d.from - 2) 
+            {
+                bb.clear_square(3);
+                bb.place_piece('R', 0);
             }
         }
-        else if (d.movedPiece == 'k') {
-            if (d.to == d.from + 2) {
-                bb.clearSquare(61);
-                bb.placePiece('r', 63);
+        else if (d.moved_piece == 'k') 
+        {
+            if (d.to == d.from + 2) 
+            {
+                bb.clear_square(61);
+                bb.place_piece('r', 63);
             }
-            else if (d.to == d.from - 2) {
-                bb.clearSquare(59);
-                bb.placePiece('r', 56);
+            else if (d.to == d.from - 2) 
+            {
+                bb.clear_square(59);
+                bb.place_piece('r', 56);
             }
         }
     }
@@ -401,25 +444,29 @@ void GameState::unmakeMove(const Delta &d) {
 
 
 //Makes a move but stores previous positional state
-Delta GameState::deltaMove (Move move){
-    int from = move.getFromSquare();
-    int to = move.getToSquare();
-    char piece = bb.getPieceAt(from);
+Delta GameState::delta_move (Move move)
+{
+    int from = move.get_from_square();
+    int to = move.get_to_square();
+    char piece = bb.get_piece_at(from);
     char captured;
-    MoveType moveType = move.getMoveType();
-    char promoPiece = move.getPromotionPiece();
-    if (moveType == MoveType::EN_PASSANT){
+    MoveType move_type = move.get_move_type();
+    char promo_piece = move.get_promotion_piece();
+    if (move_type == MoveType::EN_PASSANT)
+    {
         captured = white_to_move ? 'p' : 'P';
     }
-    else if (move.isPromotion()){
-        captured = bb.getPieceAt(to);
+    else if (move.is_promotion())
+    {
+        captured = bb.get_piece_at(to);
     }
-    else {
-        captured = bb.getPieceAt(to);
+    else 
+    {
+        captured = bb.get_piece_at(to);
     }
-    Delta delta = Delta(from, to, piece, captured, promoPiece, white_to_move, castleWK,
-    castleWQ, castleBK, castleBQ, en_passant, half_moves, full_moves, moveType);
-    makeMove(move);
+    Delta delta = Delta(from, to, piece, captured, promo_piece, white_to_move, castleWK,
+    castleWQ, castleBK, castleBQ, en_passant, half_moves, full_moves, move_type);
+    make_move(move);
 
     return delta;
 };

@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <string>
-enum class MoveType {
+enum class MoveType 
+{
     NORMAL,
     CASTLING,
     EN_PASSANT,
@@ -13,21 +14,22 @@ enum class MoveType {
 };
 
 
-class Move{
+class Move
+{
 public:
     int from;
     int to;
     char captured;
     char promotion;
-    MoveType moveType;
-    Move() : from (-1), to(-1), captured(' '), promotion(' '), moveType(MoveType::NORMAL){}
+    MoveType move_type;
+    Move() : from (-1), to(-1), captured(' '), promotion(' '), move_type(MoveType::NORMAL){}
 
     //the constructor
     Move(int from, int to)
     {
         this-> from = from;
         this-> to = to;
-        moveType = MoveType::NORMAL;
+        move_type = MoveType::NORMAL;
         captured = ' ';
         promotion = ' ';
     }
@@ -36,7 +38,7 @@ public:
     {
         this-> from = from;
         this-> to = to;
-        this -> moveType = type;
+        this -> move_type = type;
         captured = ' ';
         promotion = ' ';
     }
@@ -45,29 +47,29 @@ public:
     {
         this-> from = from;
         this-> to = to;
-        this-> moveType = type;
+        this-> move_type = type;
         captured = ' ';
         this-> promotion = promotion;
     }
 
 
-    int getFromSquare() const{
+    int get_from_square() const{
         return from;
     }
-    int getToSquare() const {
+    int get_to_square() const {
         return to;
     }
 
     char getCapturedPiece() const {
         return captured;
     }
-    char getPromotionPiece() const{
+    char get_promotion_piece() const{
         return promotion;
     }
-    MoveType getMoveType() const {
-        return moveType;
+    MoveType get_move_type() const {
+        return move_type;
     }
-    std::string squareToAlgebraic(int sq) const{
+    std::string square_to_algebraic(int sq) const{
         if (sq < 0 || sq > 63){
             return "-";
         }
@@ -78,18 +80,18 @@ public:
         s += rank;
         return s;
     }
-    bool isPromotion() const{
-        return moveType == MoveType::PROMOTION_QUEEN ||
-            moveType == MoveType::PROMOTION_ROOK ||
-            moveType == MoveType::PROMOTION_BISHOP ||
-            moveType == MoveType::PROMOTION_KNIGHT;
+    bool is_promotion() const{
+        return move_type == MoveType::PROMOTION_QUEEN ||
+            move_type == MoveType::PROMOTION_ROOK ||
+            move_type == MoveType::PROMOTION_BISHOP ||
+            move_type == MoveType::PROMOTION_KNIGHT;
     }
 
     bool operator==(const Move& other) const {
         return from == other.from && to == other.to;
     }
 
-    MoveType getPromotionMoveType(char promotion){
+    MoveType get_promotion_move_type(char promotion){
         switch(promotion){
             case 'q': return MoveType::PROMOTION_QUEEN;
             case 'r': return MoveType::PROMOTION_ROOK;

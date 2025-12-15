@@ -1,5 +1,5 @@
 #pragma once
-#include "movegenerator.h"
+#include "MoveGenerator.h"
 #include "Evaluation.h"
 #include <chrono> 
 
@@ -9,7 +9,8 @@ using timer = std::chrono::system_clock;
 constexpr int CHECKMATE_SCORE = 1000000;
 constexpr int DRAW_SCORE = 0;
 
-class Search{
+class Search
+{
 public: 
     Search();
     Search(int timeLimit);

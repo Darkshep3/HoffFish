@@ -19,14 +19,16 @@ static Search engine;
 // ---------------------------
 // Helper: clamp value
 // ---------------------------
-static int clamp(int v, int lo, int hi) {
+static int clamp(int v, int lo, int hi) 
+{
     return max(lo, min(v, hi));
 }
 
 // ---------------------------
 // Convert UCI algebraic (e2e4, g7g8q) -> internal Move
 // ---------------------------
-optional<Move> parseMove(const string &input, GameState &game) {
+optional<Move> parseMove(const string &input, GameState &game) 
+{
     if (input.length() < 4) return nullopt;
 
     int fromFile = input[0] - 'a';
@@ -38,20 +40,25 @@ optional<Move> parseMove(const string &input, GameState &game) {
     int to   = toRank * 8 + toFile;
 
     char promo = '\0';
-    if (input.length() == 5) {
+    if (input.length() == 5) 
+    {
         promo = toupper(input[4]);  // normalize promotion piece
     }
 
     // Generate legal moves
-    auto legalMoves = MoveGenerator::generateLegalMoves(game);
+    auto legalMoves = MoveGenerator::generate_legal_moves(game);
 
     // Match move
-    for (auto &m : legalMoves) {
-        if (m.getFromSquare() == from && m.getToSquare() == to) {
-            if (m.isPromotion()) {
-                if (promo != '\0' && m.getPromotionPiece() == promo)
+    for (auto &m : legalMoves) 
+    {
+        if (m.get_from_square() == from && m.get_to_square() == to) 
+        {
+            if (m.is_promotion()) 
+            {
+                if (promo != '\0' && m.get_promotion_piece() == promo)
                     return m;
-            } else {
+            } else 
+            {
                 return m;
             }
         }
@@ -63,18 +70,22 @@ optional<Move> parseMove(const string &input, GameState &game) {
 // ---------------------------
 // Parse UCI "position" command
 // ---------------------------
-static void parsePosition(const string &line) {
+static void parsePosition(const string &line) 
+{
     stringstream ss(line);
     string token;
     ss >> token; // "position"
     ss >> token;
 
-    if (token == "startpos") {
+    if (token == "startpos") 
+    {
         game = GameState();
         if (ss >> token && token != "moves") return;
-    } else if (token == "fen") {
+    } else if (token == "fen") 
+    {
         string fen, part;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) 
+        {
             ss >> part;
             fen += part + (i < 5 ? " " : "");
         }
@@ -82,14 +93,17 @@ static void parsePosition(const string &line) {
         if (ss >> token && token != "moves") return;
     }
 
-    if (token == "moves") {
-        while (ss >> token) {
+    if (token == "moves") 
+    {
+        while (ss >> token) 
+        {
             auto m = parseMove(token, game);
-            if (!m) {
+            if (!m) 
+            {
                 cerr << "WARNING: Illegal move in UCI position: " << token << endl;
                 continue;
             }
-            game.makeMove(*m);
+            game.make_move(*m);
         }
     }
 }
@@ -99,7 +113,8 @@ static void parsePosition(const string &line) {
 // ---------------------------
 void uciLoop() {
     string line;
-    while (getline(cin, line)) {
+    while (getline(cin, line)) 
+    {
         if (line == "uci") {
             cout << "id name HoffFish\n";
             cout << "id author Allen Yang\n";
@@ -107,16 +122,20 @@ void uciLoop() {
             cout << "option name Hash type spin default 64 min 1 max 1024\n";
             cout << "uciok\n" << flush;
         } 
-        else if (line == "isready") {
+        else if (line == "isready") 
+        {
             cout << "readyok\n" << flush;
         } 
-        else if (line == "ucinewgame") {
+        else if (line == "ucinewgame") 
+        {
             game = GameState();
         } 
-        else if (line.rfind("position", 0) == 0) {
+        else if (line.rfind("position", 0) == 0) 
+        {
             parsePosition(line);
         } 
-        else if (line.rfind("go", 0) == 0) {
+        else if (line.rfind("go", 0) == 0) 
+        {
             int depth = 64;
             int movetime = -1;
             int wtime = -1, btime = -1;
@@ -126,7 +145,8 @@ void uciLoop() {
             string tok;
             ss >> tok; // "go"
 
-            while (ss >> tok) {
+            while (ss >> tok) 
+            {
                 if (tok == "depth") ss >> depth;
                 else if (tok == "movetime") ss >> movetime;
                 else if (tok == "wtime") ss >> wtime;
@@ -149,19 +169,21 @@ void uciLoop() {
 
             // Output UCI move
             cout << "bestmove " 
-                 << best.squareToAlgebraic(best.getFromSquare()) 
-                 << best.squareToAlgebraic(best.getToSquare());
-            if (best.isPromotion())
-                cout << char(tolower(best.getPromotionPiece()));
+                 << best.square_to_algebraic(best.get_from_square()) 
+                 << best.square_to_algebraic(best.get_to_square());
+            if (best.is_promotion())
+                cout << char(tolower(best.get_promotion_piece()));
             cout << "\n" << flush;
 
             // Make move internally
-            game.makeMove(best);
+            game.make_move(best);
         } 
-        else if (line == "stop") {
+        else if (line == "stop") 
+        {
             // ignored; search handles timeUp internally
         } 
-        else if (line == "quit") {
+        else if (line == "quit") 
+        {
             exit(0);
         }
     }

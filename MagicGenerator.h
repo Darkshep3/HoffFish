@@ -1,7 +1,7 @@
 #include <cstdint> 
 #include <cstdlib> 
 #include <iostream>
-#include "magic.h"
+#include "Magic.h"
 
 typedef uint64_t U64;
 
