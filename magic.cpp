@@ -71,6 +71,7 @@ U64 index_to_U64 (int index, int bits, U64 mask)
     return result;
 }
 
+//computing all the rook attack moves
 U64 compute_rmask (int sq)
 {
     U64 result = 0ULL;
@@ -87,6 +88,8 @@ U64 compute_rmask (int sq)
     return result;
 }
 
+//computing all the bishop attack moves
+
 U64 compute_bmask (int sq)
 {
     U64 result = 0ULL;
@@ -102,6 +105,9 @@ U64 compute_bmask (int sq)
         result |= (1ULL << (f + r*8));
     return result;
 }
+
+//computing all the rook attack moves with blockers
+
 U64 compute_ratt (int sq, U64 block)
 {
     U64 result = 0ULL;
@@ -125,6 +131,8 @@ U64 compute_ratt (int sq, U64 block)
     }
     return result;
 }
+
+//computing all the bishop attack moves with blockers
 
 U64 compute_batt (int sq, U64 block)
 {

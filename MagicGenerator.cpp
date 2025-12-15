@@ -9,6 +9,7 @@
 //but i think this approach should not have errors? 
 //technically after we generate this, we can store it as a txt then not need to run this again to save time! 
 
+//Simulating Randomness 
 U64 randomU64()
 {
     U64 u1, u2, u3, u4;
@@ -19,6 +20,7 @@ U64 randomU64()
     return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
 }
 
+//Fully generating random number but we are making it with less collisions 
 U64 randomU64_fewbits()
 {
     return randomU64() & randomU64() & randomU64();
@@ -34,6 +36,7 @@ int count_1s(U64 b)
     return r;     
 }
 
+//Searches for magic numbers without anything collisions aka every hashed blocker position is a unique one 
 U64 find_magic (int sq, int m, int bishop)
 {
     U64 mask, b[4096], a[4096], used[4096], magic;
