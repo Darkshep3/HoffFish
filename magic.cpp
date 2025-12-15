@@ -1,6 +1,7 @@
-#include "magic.h"
+#include "Magic.h"
 
-const int RBits[64] = {
+const int RBits[64] = 
+{
   12, 11, 11, 11, 11, 11, 11, 12,
   11, 10, 10, 10, 10, 10, 10, 11,
   11, 10, 10, 10, 10, 10, 10, 11,
@@ -11,7 +12,8 @@ const int RBits[64] = {
   12, 11, 11, 11, 11, 11, 11, 12
 };
 
-const int BBits[64] = {
+const int BBits[64] = 
+{
   6, 5, 5, 5, 5, 5, 5, 6,
   5, 5, 5, 5, 5, 5, 5, 5,
   5, 5, 7, 7, 7, 7, 5, 5,
@@ -57,7 +59,8 @@ U64 bmask[64];
 U64 RookAttackTable[64][4096];
 U64 BishopAttackTable[64][512];
 
-U64 index_to_U64 (int index, int bits, U64 mask){
+U64 index_to_U64 (int index, int bits, U64 mask)
+{
     int i;
     U64 result = 0ULL;
     for (int j = 0; j < bits; j++){
@@ -68,7 +71,8 @@ U64 index_to_U64 (int index, int bits, U64 mask){
     return result;
 }
 
-U64 compute_rmask (int sq){
+U64 compute_rmask (int sq)
+{
     U64 result = 0ULL;
     int rank = sq/8;
     int file = sq % 8;
@@ -83,7 +87,8 @@ U64 compute_rmask (int sq){
     return result;
 }
 
-U64 compute_bmask (int sq){
+U64 compute_bmask (int sq)
+{
     U64 result = 0ULL;
     int rank = sq / 8;
     int file = sq % 8;
@@ -97,7 +102,8 @@ U64 compute_bmask (int sq){
         result |= (1ULL << (f + r*8));
     return result;
 }
-U64 compute_ratt (int sq, U64 block){
+U64 compute_ratt (int sq, U64 block)
+{
     U64 result = 0ULL;
     int rank = sq/8;
     int file = sq % 8;
@@ -120,44 +126,55 @@ U64 compute_ratt (int sq, U64 block){
     return result;
 }
 
-U64 compute_batt (int sq, U64 block){
+U64 compute_batt (int sq, U64 block)
+{
     U64 result = 0ULL;
     int rank = sq / 8;
     int file = sq % 8;
-    for (int r = rank + 1, f = file + 1; r <= 7 && f <= 7; r++, f++){
+    for (int r = rank + 1, f = file + 1; r <= 7 && f <= 7; r++, f++)
+    {
         result |= (1ULL << (f + r*8));
         if (block & (1ULL << (f + r*8))) break;
     }
-    for (int r = rank - 1, f = file + 1; r >= 0 && f <= 7; r--, f++){
+    for (int r = rank - 1, f = file + 1; r >= 0 && f <= 7; r--, f++)
+    {
         result |= (1ULL << (f + r*8));
         if (block & (1ULL << (f + r*8))) break;
     }
-    for (int r = rank - 1, f = file - 1; r >= 0 && f >= 0; r--, f--){
+    for (int r = rank - 1, f = file - 1; r >= 0 && f >= 0; r--, f--)
+    {
         result |= (1ULL << (f + r*8));
         if (block & (1ULL << (f + r*8))) break;
     }
-    for (int r = rank + 1, f = file - 1; r <= 7 && f >= 0; r++, f--){
+    for (int r = rank + 1, f = file - 1; r <= 7 && f >= 0; r++, f--)
+    {
         result |= (1ULL << (f + r*8));
         if (block & (1ULL << (f + r*8))) break;
     }
     return result;
 }
 
-void init_rmask(){
-    for (int sq = 0; sq < 64; sq++){
+void init_rmask()
+{
+    for (int sq = 0; sq < 64; sq++)
+    {
         rmask[sq] = compute_rmask(sq);
     }
 }
 
-void init_bmask(){
-    for (int sq = 0; sq < 64; sq++){
+void init_bmask()
+{
+    for (int sq = 0; sq < 64; sq++)
+    {
         bmask[sq] = compute_bmask(sq);
     }
 }
 
-void init_magic_tables(){
+void init_magic_tables()
+{
     //initializing rook attack tables
-    for (int sq = 0; sq < 64; sq++){
+    for (int sq = 0; sq < 64; sq++)
+    {
         U64 mask = rmask[sq];
         int bits = RBits[sq];
         int max = 1 << bits;
@@ -168,7 +185,8 @@ void init_magic_tables(){
         }
     }
     //initializing bishop attack tables
-    for (int sq = 0; sq < 64; sq++){
+    for (int sq = 0; sq < 64; sq++)
+    {
         U64 mask = bmask[sq];
         int bits = BBits[sq];
         int max = 1 << bits;
@@ -181,7 +199,8 @@ void init_magic_tables(){
     }
 }
 
-void init_magic(){
+void init_magic()
+{
     init_rmask();
     init_bmask();
     init_magic_tables();

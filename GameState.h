@@ -5,7 +5,8 @@
 #include "Delta.h"
 using namespace std;
 
-class GameState{
+class GameState
+{
     public: 
         Bitboard bb;
         bool white_to_move;
@@ -19,10 +20,10 @@ class GameState{
         GameState(); //Diana
         GameState(const string& fen); //Load from FEN string, Diana 
 
-        string exportFEN(); 
+        string export_FEN(); 
 
-        void makeMove(Move move);
-        void unmakeMove(const Delta& d); // medium task #6 Ethan 
-        Delta deltaMove(Move move); //essentially runs make move but leaves behind the copy of the original position 
+        void make_move(Move move);
+        void unmake_move(const Delta& d); // medium task #6 Ethan 
+        Delta delta_move(Move move); //essentially runs make move but leaves behind the copy of the original position 
 
 };

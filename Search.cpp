@@ -3,66 +3,81 @@ using namespace std;
 #include <algorithm> 
 #include <iostream>
 
-Search::Search() : timeLimitMs(10000), timeUp(false), searchDepth(5){}
+Search::Search() : time_limit_ms(10000), time_up(false), search_depth(5){}
 
-Search::Search (int time_limit) : timeLimitMs(time_limit), timeUp(false), searchDepth(5){}
+Search::Search (int time_limit) : time_limit_ms(time_limit), time_up(false), search_depth(5){}
 
-void Search::setSearchDepth(int depth){
-    searchDepth = depth;
+void Search::set_search_depth(int depth)
+{
+    search_depth = depth;
 }
-void Search::setTimeLimitMs(int ms) {
-    timeLimitMs = ms;
+void Search::set_time_limit_ms(int ms) 
+{
+    time_limit_ms = ms;
 }
-double Search::alphabeta(GameState& game, int depth, double alpha, double beta, int maxDepth) {
+double Search::alpha_beta(GameState& game, int depth, double alpha, double beta, int max_depth) 
+{
 
-    if (timeExceeded()){
+    if (time_exceeded())
+    {
         return Evaluation::evaluate(game.bb);
     }
     
-    if (depth == 0) {
+    if (depth == 0) 
+    {
         return Evaluation::evaluate(game.bb);
     }
-    auto moves = MoveGenerator::generateLegalMoves(game);
+    auto moves = MoveGenerator::generate_legal_moves(game);
 
-    if (moves.empty()){
-        if (MoveGenerator::is_in_check(game.white_to_move, game.bb)){
-            return game.white_to_move? -CHECKMATE_SCORE + (maxDepth-depth) : CHECKMATE_SCORE - (maxDepth - depth);
+    if (moves.empty())
+    {
+        if (MoveGenerator::is_in_check(game.white_to_move, game.bb))
+        {
+            return game.white_to_move? -CHECKMATE_SCORE + (max_depth-depth) : CHECKMATE_SCORE - (max_depth - depth);
         }
         else 
             return DRAW_SCORE;
     }
-    orderMoves(moves);
+    order_moves(moves);
 
     bool maximizing = game.white_to_move;
-    if (maximizing) {
+    if (maximizing) 
+    {
         double value = -1e9;
-        for (Move& move : moves) {
+        for (Move& move : moves) 
+        {
             //Also modified your previous approach as creating a new gamestate instead of delta is alot more inefficient
-            Delta d = game.deltaMove(move);
-            double score = alphabeta(game, depth - 1, alpha, beta, maxDepth);
-            game.unmakeMove(d);
-            if (score > value) {
+            Delta d = game.delta_move(move);
+            double score = alpha_beta(game, depth - 1, alpha, beta, max_depth);
+            game.unmake_move(d);
+            if (score > value) 
+            {
                 value = score;
             }
             // value = max(value, alphabeta(new_game, depth - 1, alpha, beta, false));
-            if (value >= beta) {
+            if (value >= beta) 
+            {
                 break;
             }
             alpha = max(alpha, value);
         }
         return value;
-    } else {
+    } else 
+    {
         double value = 1e9;
         Move best_move = Move(-1,-1);
-        for (Move& move : moves) {
-            Delta d = game.deltaMove(move);
-            double score = alphabeta(game, depth - 1, alpha, beta, maxDepth);
-            game.unmakeMove(d);
-            if (score < value) {
+        for (Move& move : moves) 
+        {
+            Delta d = game.delta_move(move);
+            double score = alpha_beta(game, depth - 1, alpha, beta, max_depth);
+            game.unmake_move(d);
+            if (score < value) 
+            {
                 value = score;
             }
             // value = min(value, alphabeta(new_game, depth - 1, alpha, beta, true));
-            if (value <= alpha) {
+            if (value <= alpha) 
+            {
                 break;
             }
             beta = min(beta, value);
@@ -71,83 +86,95 @@ double Search::alphabeta(GameState& game, int depth, double alpha, double beta, 
     }
 }   
 
-int Search::getMovePriority(Move m){
-    MoveType moveType = m.getMoveType();
-    if (m.isPromotion()) return 3;
-    else if (moveType == MoveType::CAPTURES) return 2;
-    else if (moveType == MoveType::EN_PASSANT) return 1;
+int Search::get_move_priority(Move m)
+{
+    MoveType move_type = m.get_move_type();
+    if (m.is_promotion()) return 3;
+    else if (move_type == MoveType::CAPTURES) return 2;
+    else if (move_type == MoveType::EN_PASSANT) return 1;
     return 0;
 }
 
-void Search::orderMoves (vector<Move> &moves){
-    std::sort(moves.begin(), moves.end(), [] (const Move& m1, const Move& m2){
-        return getMovePriority(m1) > getMovePriority(m2);
+void Search::order_moves (vector<Move> &moves)
+{
+    std::sort(moves.begin(), moves.end(), [] (const Move& m1, const Move& m2)
+    {
+        return get_move_priority(m1) > get_move_priority(m2);
     });
 }
 
-Move Search::alphaBetaRoot(GameState& game, int depth){
-    vector <Move> legalMoves = MoveGenerator::generateLegalMoves(game);
-    orderMoves(legalMoves);
+Move Search::alpha_beta_root(GameState& game, int depth)
+{
+    vector <Move> legalMoves = MoveGenerator::generate_legal_moves(game);
+    order_moves(legalMoves);
 
-    Move bestMove;
+    Move best_move;
     bool max_player = game.white_to_move;
-    double bestScore = max_player ? -1e9 : 1e9;
+    double best_score = max_player ? -1e9 : 1e9;
     double alpha = -1e9;
     double beta = 1e9;
 
-    for (Move& move: legalMoves){
-        if (timeExceeded()){
+    for (Move& move: legalMoves)
+    {
+        if (time_exceeded()){
             break;
         }
-        Delta delta = game.deltaMove(move);
-        double score = alphabeta(game, depth-1, alpha, beta, depth);
-        game.unmakeMove(delta);
+        Delta delta = game.delta_move(move);
+        double score = alpha_beta(game, depth-1, alpha, beta, depth);
+        game.unmake_move(delta);
         if (max_player){
-            if (score > bestScore){
-                bestScore = score;
-                bestMove = move;
+            if (score > best_score)
+            {
+                best_score = score;
+                best_move = move;
             }
             alpha = max(alpha, score);
         }
         else{
-            if (score < bestScore) {
-                bestScore = score;
-                bestMove = move;
+            if (score < best_score) 
+            {
+                best_score = score;
+                best_move = move;
             }
             beta = min(beta, score);
         }
 
     }
-    //cout << "Eval: " << game.white_to_move ? bestScore: -bestScore;
+    //cout << "Eval: " << game.white_to_move ? best_score: -best_score;
 
-    return bestMove; 
+    return best_move; 
 }
 
-Move Search::findBestMoveIterative(GameState& game, int maxDepth){
-    startTime = timer::now();
-    timeUp = false;
-    Move bestMove = Move();
-    for (int depth = 1; depth <= maxDepth; depth++){
-        Move currentBestMove = alphaBetaRoot(game, depth);
-        if (!timeUp)
-            bestMove = currentBestMove;
+Move Search::find_best_move_iterative(GameState& game, int max_depth)
+{
+    start_time = timer::now();
+    time_up = false;
+    Move best_move = Move();
+    for (int depth = 1; depth <= max_depth; depth++)
+    {
+        Move currentBestMove = alpha_beta_root(game, depth);
+        if (!time_up)
+            best_move = currentBestMove;
         else 
             break;
     }
 
-    return bestMove;
+    return best_move;
 }
 
-Move Search::findBestMove (GameState& game, int maxDepth){
-    return findBestMoveIterative(game, maxDepth);
+Move Search::find_best_move (GameState& game, int max_depth)
+{
+    return find_best_move_iterative(game, max_depth);
 }
 
-bool Search::timeExceeded(){
-    if (timeUp) return true;
+bool Search::time_exceeded()
+{
+    if (time_up) return true;
     auto now = timer::now();
-    auto ms = chrono::duration_cast<chrono::milliseconds>(now-startTime).count();
-    if (ms > timeLimitMs){
-        timeUp = true;
+    auto ms = chrono::duration_cast<chrono::milliseconds>(now-start_time).count();
+    if (ms > time_limit_ms)
+    {
+        time_up = true;
         return true;
     }
     return false;

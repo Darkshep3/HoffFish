@@ -1,14 +1,15 @@
 #pragma once
 #include "GameState.h"
 #include "Move.h"
-#include "pieces.h"
+#include "Pieces.h"
 #include <vector>
 
-class MoveGenerator {
+class MoveGenerator 
+{
 public: 
 //Diana 
-    static vector<Move> generatePseudoMoves(GameState& state);
-    static vector<Move> generateLegalMoves(GameState& state); 
+    static vector<Move> generate_pseudo_moves(GameState& state);
+    static vector<Move> generate_legal_moves(GameState& state); 
 //private:
     static void generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves);
     static void generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves);

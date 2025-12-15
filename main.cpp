@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdlib> 
-#include "magic_generator.h"
+#include "MagicGenerator.h"
 #include <optional>
 #include "Search.h"
 #include <algorithm>
@@ -11,11 +11,11 @@ const int SEARCH_DEPTH = 5;
 void testing();
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white);
 void testing2();
-void printMoves(const vector<Move>& moves);
+void print_moves(const vector<Move>& moves);
 
 int main ()
 {
-    //uciLoop();
+    //uci_loop();
 
     //Original Terminal Mode
     GameState game;
@@ -30,7 +30,8 @@ int main ()
     return 0;
 }
 
-optional<Move> parseMove(string input, GameState game) {
+optional<Move> parse_move(string input, GameState game) 
+{
     bool valid0; 
     bool valid1;
     bool valid2;
@@ -54,14 +55,15 @@ optional<Move> parseMove(string input, GameState game) {
     valid1 = (49 <= input[1] && input[1] <= 56);
     valid2 = (97 <= input[2] && input[2] <= 104);
     valid3 = (49 <= input[3] && input[3] <= 56);
-    if (!(valid0 && valid1 && valid2 && valid3 && valid4 && valid5)) {
+    if (!(valid0 && valid1 && valid2 && valid3 && valid4 && valid5)) 
+    {
         cout << "invalid string parse: " << valid0 << valid1 << valid2 << valid3 << valid4 << valid5 << endl;
         return nullopt;
     }
     int from = (input[0] - 97) + (input[1] - 49) * 8;
     int to = (input[2] - 97) + (input[3] - 49) * 8;
     // cout << "from = " << from << ", to = " << to << endl;
-    bool moving_own_piece = game.white_to_move ? (game.bb.getWhitePieces() & (1ULL << from)) : (game.bb.getBlackPieces() & (1ULL << from));
+    bool moving_own_piece = game.white_to_move ? (game.bb.get_white_pieces() & (1ULL << from)) : (game.bb.get_black_pieces() & (1ULL << from));
     if (!moving_own_piece) {
         cout << "must move own piece" << endl;
         return nullopt;
@@ -72,10 +74,10 @@ optional<Move> parseMove(string input, GameState game) {
     if (input.length() == 6){
         char promo = game.white_to_move? toupper(input [5]) : tolower(input[5]);
         move.promotion = promo;
-        move.moveType = move.getPromotionMoveType(promo);
+        move.move_type = move.get_promotion_move_type(promo);
     }
 
-    vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
+    vector<Move> legal_moves = MoveGenerator::generate_legal_moves(game);
 
     //Arush I changed ur ending because when u used return move ^ u lose whether or not it was MoveType::EnPassant as move(from, to) is always MoveType::NORMAL
     for (const Move& m : legal_moves){
@@ -89,13 +91,14 @@ optional<Move> parseMove(string input, GameState game) {
 }
 
 
-bool isGameOver (GameState game) {
+bool is_game_over (GameState game) 
+{
     //check if the current player has no legal moves or if the halfmove count is above 100 for 50-move rule
-    vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
-    //printMoves(legal_moves);
+    vector<Move> legal_moves = MoveGenerator::generate_legal_moves(game);
+    //print_moves(legal_moves);
     bool no_legal_moves = true;
     for (Move move : legal_moves) {
-        if ((1ULL << move.getFromSquare()) & (game.white_to_move ? game.bb.getWhitePieces() : game.bb.getBlackPieces())) {
+        if ((1ULL << move.get_from_square()) & (game.white_to_move ? game.bb.get_white_pieces() : game.bb.get_black_pieces())) {
             no_legal_moves = false;
         }
     }
@@ -116,19 +119,20 @@ bool isGameOver (GameState game) {
 
 
 //starts a chess gamed
-void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
+void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
+{
     Search engine = Search(1000);
     bool game_on = true;
     while (game_on) {
         // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
         // printMoves(legal_moves);
-        game.bb.displayBoard();
+        game.bb.display_board();
         // cout << "Score: " << e.evaluate(game.bb) << endl;
 
         if (is_playing_against_engine && (game.white_to_move == is_engine_white)) {
-            Move topEngine = engine.findBestMove(game, SEARCH_DEPTH);
-            //cout << "Engine plays: " << topEngine.squareToAlgebraic(topEngine.from) << topEngine.squareToAlgebraic(topEngine.to) << endl;
-            game.makeMove(topEngine);
+            Move top_engine = engine.find_best_move(game, SEARCH_DEPTH);
+            //cout << "Engine plays: " << top_engine.square_to_algebraic(top_engine.from) << top_engine.square_to_algebraic(top_engine.to) << endl;
+            game.make_move(top_engine);
         } 
         else {
             string player_color = game.white_to_move ? "White: " : "Black: ";
@@ -139,9 +143,9 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
 
             if (player_move == "quit") game_on = false;
             else {
-                optional<Move> move = parseMove(player_move, game);
+                optional<Move> move = parse_move(player_move, game);
                 if (move) {
-                    game.makeMove(*move);
+                    game.make_move(*move);
                 } else {
                     cout << "Invalid move, please try again." << endl;
                 }
@@ -150,7 +154,7 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
 
 
 
-        if (isGameOver(game)) {
+        if (is_game_over(game)) {
             game_on = false;
         }
 
@@ -168,33 +172,37 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white){
     }
 }
 
-void testing() {
+void testing() 
+{
     cout << "hi this is testing stuff" << endl;
     //GameState game = GameState();
     GameState game("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-    game.bb.displayBoard();
+    game.bb.display_board();
 
     MoveGenerator mg;
-    vector<Move> moves = mg.generateLegalMoves(game);
+    vector<Move> moves = mg.generate_legal_moves(game);
     
-    printMoves(moves);
+    print_moves(moves);
 
-    cout << game.exportFEN() << endl;
+    cout << game.export_FEN() << endl;
 }
 
-void testing2(){
+void testing2()
+{
     cout << "Magic Generator!!" << endl;
     magic_generator();
 }
 
-void printMoves(const vector<Move>& moves) {
+void print_moves(const vector<Move>& moves) 
+{
     int count = 0;
-    for (const Move& m : moves) {
+    for (const Move& m : moves) 
+    {
         count++;
-        int from = m.getFromSquare();
-        int to = m.getToSquare();
-        cout << count << ". " << m.squareToAlgebraic(from) << m.squareToAlgebraic(to);
-        if (m.isPromotion())
+        int from = m.get_from_square();
+        int to = m.get_to_square();
+        cout << count << ". " << m.square_to_algebraic(from) << m.square_to_algebraic(to);
+        if (m.is_promotion())
             cout << "=" << char(toupper(m.promotion));
         cout << endl;
     }

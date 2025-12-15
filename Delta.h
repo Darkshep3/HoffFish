@@ -4,32 +4,32 @@
 class Delta {
 public: 
     int from, to;
-    char movedPiece;
-    char capturedPiece;
-    char promotionPiece;
+    char moved_piece;
+    char captured_piece;
+    char promotion_piece;
 
     bool white_to_move;
     bool castleWK, castleWQ;
     bool castleBK, castleBQ;
-    int enPassant;
-    int halfCount;
-    int fullCount;
+    int en_passant;
+    int half_count;
+    int full_count;
 
-    MoveType moveType;
+    MoveType move_type;
 
     //constructor
-    Delta(int from, int to, char movedPiece, char capturedPiece, char promotionPiece, bool white_to_move, bool castleWK,
-        bool castleWQ, bool castleBK, bool castleBQ, int enPassant, int halfCount, int fullCount, MoveType movetype):
+    Delta(int from, int to, char moved_piece, char captured_piece, char promotion_piece, bool white_to_move, bool castleWK,
+        bool castleWQ, bool castleBK, bool castleBQ, int en_passant, int half_count, int full_count, MoveType move_type):
         from(from), 
         to(to), 
-        movedPiece(movedPiece), 
-        capturedPiece(capturedPiece), 
-        promotionPiece(promotionPiece),
+        moved_piece(moved_piece), 
+        captured_piece(captured_piece), 
+        promotion_piece(promotion_piece),
         white_to_move(white_to_move), 
         castleWK(castleWK), castleWQ(castleWQ), 
         castleBK(castleBK), castleBQ(castleBQ),
-        enPassant(enPassant), 
-        halfCount(halfCount), fullCount(fullCount), 
-        moveType(movetype)
+        en_passant(en_passant), 
+        half_count(half_count), full_count(full_count), 
+        move_type(move_type)
         {}
     };

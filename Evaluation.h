@@ -9,14 +9,16 @@ class Evaluation{
     static const int WHITE = 0;
     static const int BLACK = 1;
     static const int MAX_GAME_PHASE = 24;
-    static constexpr int PIECE_VALUES [2][6] = { //You need constexpr for arrays
+    static constexpr int PIECE_VALUES [2][6] = 
+    { //You need constexpr for arrays
     //P N B R Q K
     {82, 337, 365, 477, 1025, 12000}, //middlegame 
-    {94, 281, 297, 512, 936, 12000}}; //endgame
+    {94, 281, 297, 512, 936, 12000} //endgame
+    }; 
     static const int CONNECTED_PAWN_SCORE = 6;
     static const int DOUBLE_PAWN_SCORE = 13;
     static const  int ISOLATED_PAWN_SCORE = 7;
-    static constexpr int midgamePST [6][64] = 
+    static constexpr int midgame_PST [6][64] = 
     {
         //pawn
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -72,7 +74,7 @@ class Evaluation{
         -9, 24, 2, -16, -20, 6, 22, -22,
         29, -1, -20, -7, -8, -4, -38, -29,
         -65, 23, 16, -15, -56, -34, 2, 13}};
-    static constexpr int endgamePST [6][64] = 
+    static constexpr int endgame_PST [6][64] = 
         {
         //pawns 
         {0, 0, 0, 0, 0, 0, 0, 0,
@@ -131,7 +133,7 @@ class Evaluation{
 
     public:
         static double evaluate(Bitboard& bb);
-        static double scorePiece(U64 bb, int pieceType, int color, int gamePhase);
-        static int connectedPawnBonus(U64 pawns, int color);
-        static int pawnStructurePenalty(U64 pawns, int color);
+        static double score_piece(U64 bb, int piece_type, int color, int game_phase);
+        static int connected_pawn_bonus(U64 pawns, int color);
+        static int pawn_structure_penalty(U64 pawns, int color);
 };

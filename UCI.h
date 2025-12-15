@@ -2,4 +2,4 @@
 #include <string>
 
 // Starts the UCI loop
-void uciLoop();
+void uci_loop();
