@@ -247,17 +247,15 @@ void MoveGenerator::generate_knight_moves(Bitboard& bb, U64 allies, bool isWhite
        clear_LSB(knights);
        //remove current knight from bitboard
 
-
        U64 temp = get_knight_attacks(from_sq, allies);
-
 
        while(temp != 0)
        {
-            int to_sq = get_LSB(temp);
-            clear_LSB(temp);
+        //as long as knight has places to go
+            int to_sq = get_LSB(temp); //get one square from the bit board of knight attacks
+            clear_LSB(temp);//get rid of that square
         
-
-            moves.push_back(Move(from_sq,to_sq));
+            moves.push_back(Move(from_sq,to_sq)); //add it to the vector of possible moves
        }
    }
 }
