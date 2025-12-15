@@ -140,7 +140,7 @@ Move Search::alpha_beta_root(GameState& game, int depth)
         }
 
     }
-    //cout << "Eval: " << game.white_to_move ? best_score: -best_score;
+    cout << "Eval: " << best_score << endl;
 
     return best_move; 
 }

@@ -4,7 +4,6 @@
 #include <optional>
 #include "Search.h"
 #include <algorithm>
-#include "UCI.h"
 using namespace std;
 
 const int SEARCH_DEPTH = 5;
@@ -15,7 +14,6 @@ void print_moves(const vector<Move>& moves);
 
 int main ()
 {
-    //uci_loop();
 
     //Original Terminal Mode
     GameState game;
@@ -26,7 +24,7 @@ int main ()
     bool is_playing_against_engine = true;
     bool is_engine_white = false;
     play(game, is_playing_against_engine, is_engine_white);
-    //testing2();
+    //testing2();i
     return 0;
 }
 
@@ -121,7 +119,7 @@ bool is_game_over (GameState game)
 //starts a chess gamed
 void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
 {
-    Search engine = Search(1000);
+    Search engine = Search(1200);
     bool game_on = true;
     while (game_on) {
         // vector<Move> legal_moves = MoveGenerator::generateLegalMoves(game);
@@ -151,15 +149,9 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
                 }
             }
         }
-
-
-
         if (is_game_over(game)) {
             game_on = false;
         }
-
-
-
         // int from = (player_move[0] - 97) + (player_move[1] - 1) * 8;
         // int to = (player_move[2] - 97) + (player_move[3] - 1) * 8;
         // bool moving_own_piece = (game.bb.getWhitePieces() & (1ULL << from));
@@ -170,6 +162,8 @@ void play(GameState game, bool is_playing_against_engine, bool is_engine_white)
         // game.makeMove(move); 
 
     }
+    game.bb.display_board();
+
 }
 
 void testing() 
