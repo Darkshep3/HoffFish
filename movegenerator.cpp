@@ -1,6 +1,6 @@
 #include "MoveGenerator.h"
 
- bool MoveGenerator::isAttackedSquare(Bitboard& bb, int square, bool check_for_white)
+ bool MoveGenerator::is_attacked_square(Bitboard& bb, int square, bool check_for_white)
  {
     //allies bit board
     U64 allies = check_for_white ? bb.get_white_pieces() : bb.get_black_pieces();
@@ -12,14 +12,14 @@
     //get a list of the enemy's attack sqaures as a bitboard
     //enemy king
     U64 king_sq = get_LSB(check_for_white ? bb.bking : bb.wking); 
-    U64 king_attacks = getKingAttacks(king_sq, enemies); // enemies here = other side's king's allies
+    U64 king_attacks = get_king_attacks(king_sq, enemies); // enemies here = other side's king's allies
     //enemy knight
     U64 knights = check_for_white ? bb.bknights : bb.wknights;
     U64 knights_attacks = 0ULL; //all knights' attacks
     while(knights != 0)
     {
         int sq = get_LSB(knights);
-        U64 current_attacks = getKnightAttacks(sq, enemies); //one knight's attacks
+        U64 current_attacks = get_knight_attacks(sq, enemies); //one knight's attacks
         knights_attacks = knights_attacks | current_attacks; //adding it to all knights' bb
         clear_LSB(knights); //moves on to the next knight
     }
@@ -29,7 +29,7 @@
     while(rooks != 0)
     {
         int sq = get_LSB(rooks);
-        U64 current_attacks = getRookAttacks(sq, bb.get_occupied(), 0ULL);
+        U64 current_attacks = get_rook_attacks(sq, bb.get_occupied(), 0ULL);
         rooks_attacks = rooks_attacks | current_attacks;
         clear_LSB(rooks);
     }
@@ -39,7 +39,7 @@
     while(bishops != 0)
     {
         int sq = get_LSB(bishops);
-        U64 current_attacks = getBishopAttacks(sq, bb.get_occupied(), 0ULL);
+        U64 current_attacks = get_bishop_attacks(sq, bb.get_occupied(), 0ULL);
         bishops_attacks = bishops_attacks | current_attacks;
         clear_LSB(bishops);
     }
@@ -49,7 +49,7 @@
     while(queens != 0)
     {
         int sq = get_LSB(queens);
-        U64 current_attacks = getQueenAttacks(sq, bb.get_occupied(), 0ULL);
+        U64 current_attacks = get_queen_attacks(sq, bb.get_occupied(), 0ULL);
         queens_attacks = queens_attacks | current_attacks;
         clear_LSB(queens);
     }
@@ -98,24 +98,23 @@ vector<Move> MoveGenerator::generate_pseudo_moves(GameState& state)
         //loop through all that side’s pieces
 
         //pawns
-        generatePawnMoves(bb, enemy, empty, state.en_passant, true, moves);
+        generate_pawn_moves(bb, enemy, empty, state.en_passant, true, moves);
         //true bc white is already checked to be active here
 
         //knights
-        generateKnightMoves(bb, ally, true, moves);
+        generate_knight_moves(bb, ally, true, moves);
 
         //bishops
-        generateBishopMoves(bb, ally, true, moves);
+        generate_bishop_moves(bb, ally, true, moves);
 
         //rooks
-        generateRookMoves(bb, ally, true, moves);
+        generate_rook_moves(bb, ally, true, moves);
 
         //queens
-        //to be coded
-        generateQueenMoves(bb, ally, true, moves);
+        generate_queen_moves(bb, ally, true, moves);
 
         //king
-        generateKingMoves(bb, ally, empty, true, state.castleWK, state.castleWQ, moves);
+        generate_king_moves(bb, ally, empty, true, state.castleWK, state.castleWQ, moves);
         
         
     }else
@@ -129,25 +128,25 @@ vector<Move> MoveGenerator::generate_pseudo_moves(GameState& state)
         //loop through all that side’s pieces
 
         //pawns
-        generatePawnMoves(bb, enemy, empty, state.en_passant, false, moves);
+        generate_pawn_moves(bb, enemy, empty, state.en_passant, false, moves);
         //true bc white is already checked to be active here
 
         //knights
-        generateKnightMoves(bb, ally, false, moves);
+        generate_knight_moves(bb, ally, false, moves);
 
         //bishops
-        generateBishopMoves(bb, ally, false, moves);
+        generate_bishop_moves(bb, ally, false, moves);
 
         //rooks
         //to be coded
-        generateRookMoves(bb, ally, false, moves);
+        generate_rook_moves(bb, ally, false, moves);
 
         //queens
         //to be coded
-        generateQueenMoves(bb, ally, false, moves);
+        generate_queen_moves(bb, ally, false, moves);
 
         //king
-        generateKingMoves(bb, ally, empty, false, state.castleBK, state.castleBQ, moves);
+        generate_king_moves(bb, ally, empty, false, state.castleBK, state.castleBQ, moves);
     }
     
     //return vector
@@ -160,7 +159,7 @@ bool MoveGenerator::is_in_check(bool check_for_white, Bitboard bb)
     U64 king = check_for_white ? bb.wking : bb.bking;  
     int sq = get_LSB(king); 
     
-    return isAttackedSquare(bb, sq, check_for_white);
+    return is_attacked_square(bb, sq, check_for_white);
 }
 
 vector<Move> MoveGenerator::generate_legal_moves(GameState& state)
@@ -192,18 +191,18 @@ vector<Move> MoveGenerator::generate_legal_moves(GameState& state)
 }
 
 
-void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves)
+void MoveGenerator::generate_king_moves(Bitboard& bb, U64 allies, U64 empty, bool isWhiteToMove, bool kCastle, bool qCastle, vector<Move>& moves)
 {
     U64 king = isWhiteToMove ? bb.wking : bb.bking;
     int fromSq = get_LSB(king);
-    U64 temp = getKingAttacks(fromSq, allies);
+    U64 temp = get_king_attacks(fromSq, allies);
     while (temp != 0){
         moves.push_back(Move(fromSq, get_LSB(temp)));
         temp &= temp -1;
     }
     //ends prematuraly as king cannot castle in check
 
-    if (isAttackedSquare(bb, fromSq, isWhiteToMove)) 
+    if (is_attacked_square(bb, fromSq, isWhiteToMove)) 
     {
         return;
     }
@@ -212,8 +211,8 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool 
     {
         int sq = isWhiteToMove? 5: 61;
         int sq2 = isWhiteToMove? 6: 62;
-        bool f = (((1ULL << (sq)) & empty) != 0) && !(isAttackedSquare(bb, sq, isWhiteToMove));
-        bool g = (((1ULL << (sq2)) & empty) != 0) && !(isAttackedSquare(bb, sq2, isWhiteToMove));
+        bool f = (((1ULL << (sq)) & empty) != 0) && !(is_attacked_square(bb, sq, isWhiteToMove));
+        bool g = (((1ULL << (sq2)) & empty) != 0) && !(is_attacked_square(bb, sq2, isWhiteToMove));
         if (f && g) {
             int toSq = isWhiteToMove? 6: 62;
             moves.push_back(Move(fromSq, toSq, MoveType::CASTLING));
@@ -225,8 +224,8 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool 
         int sq2 = isWhiteToMove? 2: 58;
         int sq3 = isWhiteToMove? 3: 59;
         bool b = ((1ULL << (sq)) & empty) != 0;
-        bool c = ((1ULL << sq2) & empty) != 0 && !(isAttackedSquare(bb, sq2, isWhiteToMove));
-        bool d = ((1ULL << sq3) & empty) != 0 && !(isAttackedSquare(bb, sq3, isWhiteToMove));
+        bool c = ((1ULL << sq2) & empty) != 0 && !(is_attacked_square(bb, sq2, isWhiteToMove));
+        bool d = ((1ULL << sq3) & empty) != 0 && !(is_attacked_square(bb, sq3, isWhiteToMove));
 
         if (b && c && d)
         {
@@ -237,7 +236,7 @@ void MoveGenerator::generateKingMoves(Bitboard& bb, U64 allies, U64 empty, bool 
 }
 
 //Diana 
-void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_knight_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
    U64 knights = isWhiteToMove ? bb.wknights : bb.bknights;
 
@@ -249,7 +248,7 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteTo
        //remove current knight from bitboard
 
 
-       U64 temp = getKnightAttacks(from_sq, allies);
+       U64 temp = get_knight_attacks(from_sq, allies);
 
 
        while(temp != 0)
@@ -265,7 +264,7 @@ void MoveGenerator::generateKnightMoves(Bitboard& bb, U64 allies, bool isWhiteTo
 
 //Ethan  
 
-void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_pawn_moves(Bitboard& bb, U64 enemy, U64 empty, int enPassant, bool isWhiteToMove, vector<Move>& moves)
 {
     U64 pawns = isWhiteToMove ? bb.wpawns : bb.bpawns;
     int direction = isWhiteToMove ? 8 : -8;
@@ -353,7 +352,7 @@ void MoveGenerator::generatePawnMoves(Bitboard& bb, U64 enemy, U64 empty, int en
     }
 }
 
-void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
+void MoveGenerator::generate_bishop_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves){
    U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
 
    //loop thru each knight
@@ -362,7 +361,7 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteTo
        int from_sq = get_LSB(bishops);
        clear_LSB(bishops);
 
-       U64 temp = getBishopAttacks(from_sq, bb.get_occupied(), allies);
+       U64 temp = get_bishop_attacks(from_sq, bb.get_occupied(), allies);
 
        while(temp != 0)
        {
@@ -372,7 +371,7 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 allies, bool isWhiteTo
        }
    }
 }
-void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_rook_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
    U64 rooks = isWhiteToMove ? bb.wrooks : bb.brooks;
    while(rooks != 0)
@@ -380,7 +379,7 @@ void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, bool isWhiteToMo
        int from_sq = get_LSB(rooks);
        clear_LSB(rooks);
 
-       U64 temp = getRookAttacks(from_sq, bb.get_occupied(), allies);
+       U64 temp = get_rook_attacks(from_sq, bb.get_occupied(), allies);
 
        while(temp != 0)
        {
@@ -390,7 +389,7 @@ void MoveGenerator::generateRookMoves(Bitboard& bb, U64 allies, bool isWhiteToMo
        }
    }
 }
-void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_queen_moves(Bitboard& bb, U64 allies, bool isWhiteToMove, vector<Move>& moves)
 {
    U64 queens = isWhiteToMove ? bb.wqueens : bb.bqueens;
    while(queens != 0)
@@ -398,7 +397,7 @@ void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, bool isWhiteToM
        int from_sq = get_LSB(queens);
        clear_LSB(queens);
 
-       U64 temp = getQueenAttacks(from_sq, bb.get_occupied(), allies);
+       U64 temp = get_queen_attacks(from_sq, bb.get_occupied(), allies);
 
        while(temp != 0)
        {
@@ -412,7 +411,7 @@ void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 allies, bool isWhiteToM
 /*
 //Arush 
 //Bishop Move Generation
-void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_bishop_moves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
 {
     //create vector of squares that contain the current player's bishops
     U64 bishops = isWhiteToMove ? bb.wbishops : bb.bbishops;
@@ -457,7 +456,7 @@ void MoveGenerator::generateBishopMoves(Bitboard& bb, U64 enemy, U64 empty, bool
 }
 
 
-void MoveGenerator::generateRookMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_rook_moves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
 {
     //create vector of squares that contain the current player's rooks
     U64 rooks = isWhiteToMove ? bb.wrooks : bb.brooks;
@@ -527,10 +526,10 @@ void MoveGenerator::generateRookMoves(Bitboard& bb, U64 enemy, U64 empty, bool i
 
 
 
-void MoveGenerator::generateQueenMoves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
+void MoveGenerator::generate_queen_moves(Bitboard& bb, U64 enemy, U64 empty, bool isWhiteToMove, vector<Move>& moves)
 {
-    generateBishopMoves(bb, enemy, empty, isWhiteToMove, moves);
-    generateRookMoves(bb, enemy, empty, isWhiteToMove, moves);
+    generate_bishop_moves(bb, enemy, empty, isWhiteToMove, moves);
+    generate_rook_moves(bb, enemy, empty, isWhiteToMove, moves);
 }
 
 */
